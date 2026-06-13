@@ -15,7 +15,7 @@ Most CMS platforms require you to log in, navigate a UI, and manually manage con
 | Component | Stack | Purpose |
 |---|---|---|
 | MCP Server | Node.js | Content API + MCP protocol endpoint |
-| MCP Client | Svelte | AI agent interface for content operations |
+| MCP Client | Svelte | Standalone AI agent interface for content operations |
 | Dashboard | Svelte | Human interface for review, settings, and oversight |
 
 ---
@@ -25,22 +25,24 @@ Most CMS platforms require you to log in, navigate a UI, and manually manage con
 ```
 AI Agent
    │
-   ▼
-MCP Client (Svelte)
-   │  MCP Protocol
-   ▼
-MCP Server (Node.js)
-   │  REST / GraphQL API
-   ├──▶ Content Store
-   └──▶ Dashboard (Svelte)
-              │
-              ▼
-           Human Operator
+   ├── Claude.ai (Pro / Max / Teams)
+   │        │  MCP Protocol (HTTPS)
+   │        │
+   └── MCP Client (Svelte)
+            │  MCP Protocol
+            ▼
+       MCP Server (Node.js)
+            │  REST / GraphQL API
+            ├──▶ Content Store
+            └──▶ Dashboard (Svelte)
+                       │
+                       ▼
+                  Human Operator
 ```
 
 The **MCP Server** is the core of omnara. It manages the content layer and exposes both an MCP endpoint (for AI agents) and a conventional API (for external integrations and the dashboard).
 
-The **MCP Client** gives AI agents a structured interface to perform content operations — creating pages, updating copy, managing media, organizing taxonomies — without needing to understand the underlying data model.
+The **MCP Client** gives AI agents a structured interface to perform content operations — creating pages, updating copy, managing media, organizing taxonomies — without needing to understand the underlying data model. It is optional for users who connect via Claude.ai directly.
 
 The **Dashboard** is for humans. It lets you review AI-generated content before it goes live, manage sensitive settings (API keys, integrations, access control), and maintain oversight of what the AI is doing on your behalf.
 
@@ -48,7 +50,7 @@ The **Dashboard** is for humans. It lets you review AI-generated content before 
 
 ## Features
 
-- **AI-native content management** — manage all content through natural language via any MCP-compatible AI agent
+- **AI-native content management** — manage all content through natural language via any MCP-compatible AI agent, including Claude.ai (Pro, Max, and Teams plans)
 - **MCP Server** — standards-based MCP protocol endpoint built on Node.js, designed for scale
 - **Human oversight dashboard** — review, approve, and configure without exposing sensitive settings to AI agents
 - **Universal CMS** — serve any kind of website: blogs, storefronts, landing pages, documentation sites, or fully custom builds
@@ -90,6 +92,14 @@ npm run dev
 ```
 
 Point your MCP-compatible agent at the client endpoint to begin managing content.
+
+### Using Claude.ai as the MCP Client
+
+If you have a Claude.ai **Pro, Max, or Teams** subscription, you can skip the MCP Client entirely and connect Claude.ai directly to the omnara MCP Server:
+
+1. Make your MCP Server accessible over HTTPS (for local development, use a tunnel such as [Cloudflare Tunnel](https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/) or [ngrok](https://ngrok.com))
+2. In Claude.ai, go to **Settings → Integrations** and add your omnara server URL as a new MCP server
+3. Claude.ai will discover the available tools and you can start managing content directly from the chat interface
 
 ### Dashboard
 
