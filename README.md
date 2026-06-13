@@ -22,26 +22,20 @@ Most CMS platforms require you to log in, navigate a UI, and manually manage con
 
 ## Architecture
 
-```
-AI Agent (Claude.ai / any MCP-compatible client)
-   │
-   ├── Claude.ai (Pro / Max / Teams) ──────────────────┐
-   │        MCP Protocol (HTTPS)                       │
-   │                                                   │
-   └── MCP Client (Svelte 5 + SvelteKit)               │
-            │  MCP Protocol (stdio / HTTP)              │
-            ▼                                           │
-       MCP Server (NestJS + PostgreSQL)  ◀──────────────┘
-            │
-            ├──▶ PostgreSQL (content store)
-            │
-            └──▶ REST API
-                     │
-                     ▼
-               Dashboard (Svelte 5 + SvelteKit)
-                     │
-                     ▼
-               Human Operator
+```mermaid
+flowchart TD
+    A([AI Agent]) --> B[Claude.ai\nPro / Max / Teams]
+    A --> C[MCP Client\nSvelte 5 + SvelteKit]
+
+    B -- MCP Protocol\nHTTPS --> S
+    C -- MCP Protocol\nstdio / HTTP --> S
+
+    S[MCP Server\nNestJS + TypeScript]
+
+    S --> DB[(PostgreSQL\ncontent store)]
+    S -- REST API --> D[Dashboard\nSvelte 5 + SvelteKit]
+
+    D --> H([Human Operator])
 ```
 
 The **MCP Server** is the core of omnara. It's a NestJS application backed by PostgreSQL (via MikroORM) that exposes both an MCP endpoint for AI agents and a REST API for the dashboard. It manages content, sites, and all write operations.
