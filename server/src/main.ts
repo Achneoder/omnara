@@ -3,6 +3,7 @@ import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import helmet from 'helmet';
+import * as cookieParser from 'cookie-parser';
 import { AppModule } from './app.module.js';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter.js';
 
@@ -11,6 +12,7 @@ async function bootstrap(): Promise<void> {
 
   // Apply security headers via helmet before any other middleware
   app.use(helmet());
+  app.use(cookieParser());
 
   // Override the default Express body-parser limit (1mb) with a tighter bound
   app.useBodyParser('json', { limit: '100kb' });
