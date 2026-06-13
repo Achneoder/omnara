@@ -1,13 +1,28 @@
 {
   "name": "omnara",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "private": true,
+  "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "prepare": "husky",
+    "lint": "eslint .",
+    "format": "prettier --write \"**/*.{ts,svelte,json,md,yaml,css}\"",
+    "test": "pnpm -r test",
+    "build": "pnpm -r build"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "devDependencies": {
+    "@eslint/js": "^9.0.0",
+    "eslint": "^9.0.0",
+    "eslint-plugin-svelte": "^3.0.0",
+    "globals": "^15.0.0",
+    "husky": "^9.0.0",
+    "lint-staged": "^15.0.0",
+    "prettier": "3.4.2",
+    "prettier-plugin-svelte": "^4.0.0",
+    "prettier-plugin-tailwindcss": "^0.6.0",
+    "svelte-eslint-parser": "^1.0.0",
+    "typescript": "^5.5.0",
+    "typescript-eslint": "^8.0.0"
+  },
   "packageManager": "pnpm@11.6.0"
 }
