@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "dev": "pnpm --filter @omnara/server start:dev & pnpm --filter @omnara/client dev & pnpm --filter @omnara/dashboard dev",
     "prepare": "husky",
     "lint": "eslint .",
     "format": "prettier --write \"**/*.{ts,svelte,json,md,yaml,css}\"",
