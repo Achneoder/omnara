@@ -1,6 +1,7 @@
 import 'reflect-metadata';
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { AppModule } from './app.module.js';
 
 async function bootstrap(): Promise<void> {
@@ -14,16 +15,21 @@ async function bootstrap(): Promise<void> {
     }),
   );
 
+  const configService = app.get(ConfigService);
+
   app.enableCors({
     origin: [
-      process.env.CLIENT_URL ?? 'http://localhost:5173',
-      process.env.DASHBOARD_URL ?? 'http://localhost:5174',
+      configService.get('CLIENT_URL', 'http://localhost:5173'),
+      configService.get('DASHBOARD_URL', 'http://localhost:5174'),
     ],
     credentials: true,
   });
 
-  const port = process.env.PORT ?? 3000;
+  const port = configService.get<number>('PORT', 3000);
   await app.listen(port);
 }
 
-bootstrap();
+bootstrap().catch((err) => {
+  console.error('Fatal startup error', err);
+  process.exit(1);
+});

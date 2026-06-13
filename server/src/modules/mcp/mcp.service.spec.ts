@@ -1,4 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
+import { SSEServerTransport } from '@modelcontextprotocol/sdk/server/sse.js';
 import { McpService } from './mcp.service.js';
 
 describe('McpService', () => {
@@ -22,8 +24,8 @@ describe('McpService', () => {
   });
 
   it('should track and retrieve a session transport', () => {
-    const mockTransport = { sessionId: 'test-session-id' } as never;
-    const mockServer = {} as never;
+    const mockTransport = { sessionId: 'test-session-id' } as unknown as SSEServerTransport;
+    const mockServer = {} as unknown as McpServer;
 
     service.trackSession('test-session-id', mockServer, mockTransport);
 
@@ -31,8 +33,8 @@ describe('McpService', () => {
   });
 
   it('should remove a session', () => {
-    const mockTransport = { sessionId: 'to-remove' } as never;
-    const mockServer = {} as never;
+    const mockTransport = { sessionId: 'to-remove' } as unknown as SSEServerTransport;
+    const mockServer = {} as unknown as McpServer;
 
     service.trackSession('to-remove', mockServer, mockTransport);
     service.removeSession('to-remove');

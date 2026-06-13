@@ -1,13 +1,14 @@
 import {
+  BadRequestException,
   Controller,
   Get,
+  HttpCode,
+  HttpStatus,
+  NotFoundException,
   Post,
   Query,
   Req,
   Res,
-  HttpCode,
-  HttpStatus,
-  NotFoundException,
 } from '@nestjs/common';
 import type { Request, Response } from 'express';
 import { SSEServerTransport } from '@modelcontextprotocol/sdk/server/sse.js';
@@ -24,7 +25,12 @@ export class McpController {
 
     this.mcpService.trackSession(transport.sessionId, server, transport);
 
-    await server.connect(transport);
+    try {
+      await server.connect(transport);
+    } catch (err) {
+      this.mcpService.removeSession(transport.sessionId);
+      throw err;
+    }
 
     req.on('close', () => {
       this.mcpService.removeSession(transport.sessionId);
@@ -38,6 +44,10 @@ export class McpController {
     @Req() req: Request,
     @Res() res: Response,
   ): Promise<void> {
+    if (!sessionId) {
+      throw new BadRequestException('sessionId query parameter is required');
+    }
+
     const transport = this.mcpService.getTransport(sessionId);
 
     if (!transport) {

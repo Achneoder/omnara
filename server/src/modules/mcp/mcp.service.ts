@@ -23,17 +23,7 @@ export class McpService implements OnApplicationShutdown {
     return server;
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  private registerCapabilities(_server: McpServer): void {
-    // Register tools, resources, and prompts here as the app grows.
-    // Example:
-    // server.tool(
-    //   'list-content',
-    //   'List all content items',
-    //   z.object({ limit: z.number().optional() }),
-    //   async ({ limit }) => ({ content: [{ type: 'text', text: JSON.stringify([]) }] }),
-    // );
-  }
+  private registerCapabilities(_server: McpServer): void {}
 
   trackSession(sessionId: string, server: McpServer, transport: SSEServerTransport): void {
     this.sessions.set(sessionId, { server, transport });
@@ -50,7 +40,8 @@ export class McpService implements OnApplicationShutdown {
   }
 
   async onApplicationShutdown(): Promise<void> {
-    for (const [sessionId, { server }] of this.sessions) {
+    for (const [sessionId, { server, transport }] of this.sessions) {
+      await transport.close();
       await server.close();
       this.logger.debug(`Closed session: ${sessionId}`);
     }
