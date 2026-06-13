@@ -47,7 +47,7 @@ Use these specialized agents for their respective domains:
 
 ## Git Workflow
 
-Every change — no matter how small — follows this process:
+Every change — no matter how small — follows this process. **This is not optional and does not require a human to ask.** After completing any task that modifies files, you must commit, push, and open a PR before considering the task done. A task is only done when a PR exists.
 
 ### 1. Create a dedicated branch
 
@@ -105,6 +105,18 @@ gh pr create --title "<type>(<scope>): <summary>" --body "..."
 - **Screenshots** (for frontend changes)
 
 No PR merges without passing tests and a meaningful description.
+
+### Agent rule: always finish with a PR
+
+After completing any task that changes files in this repository, you **must** without being asked:
+
+1. Stage the relevant files
+2. Commit following Conventional Commits
+3. Push the branch with `git push -u origin <branch>`
+4. Open a PR with `gh pr create`
+5. Return the PR URL to the user
+
+Do not stop after step 1 or 2 and report the task as done. A task is only done when the PR is open and the URL has been shared. If the branch already has an open PR, push the new commit to the existing branch instead of opening a second PR.
 
 ---
 

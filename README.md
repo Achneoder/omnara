@@ -14,48 +14,47 @@ Most CMS platforms require you to log in, navigate a UI, and manually manage con
 
 | Component | Stack | Purpose |
 |---|---|---|
-| MCP Server | Node.js | Content API + MCP protocol endpoint |
-| MCP Client | Svelte | Standalone AI agent interface for content operations |
-| Dashboard | Svelte | Human interface for review, settings, and oversight |
+| MCP Server | NestJS · TypeScript · PostgreSQL · MikroORM | Content API + MCP protocol endpoint |
+| MCP Client | Svelte 5 · SvelteKit · TailwindCSS | Standalone AI agent interface for content operations |
+| Dashboard | Svelte 5 · SvelteKit · TailwindCSS | Human interface for review, settings, and oversight |
 
 ---
 
 ## Architecture
 
-```
-AI Agent
-   │
-   ├── Claude.ai (Pro / Max / Teams)
-   │        │  MCP Protocol (HTTPS)
-   │        │
-   └── MCP Client (Svelte)
-            │  MCP Protocol
-            ▼
-       MCP Server (Node.js)
-            │  REST / GraphQL API
-            ├──▶ Content Store
-            └──▶ Dashboard (Svelte)
-                       │
-                       ▼
-                  Human Operator
+```mermaid
+flowchart TD
+    A([AI Agent]) --> B[Claude.ai\nPro / Max / Teams]
+    A --> C[MCP Client\nSvelte 5 + SvelteKit]
+
+    B -- MCP Protocol\nHTTPS --> S
+    C -- MCP Protocol\nstdio / HTTP --> S
+
+    S[MCP Server\nNestJS + TypeScript]
+
+    S --> DB[(PostgreSQL\ncontent store)]
+    S -- REST API --> D[Dashboard\nSvelte 5 + SvelteKit]
+
+    D --> H([Human Operator])
 ```
 
-The **MCP Server** is the core of omnara. It manages the content layer and exposes both an MCP endpoint (for AI agents) and a conventional API (for external integrations and the dashboard).
+The **MCP Server** is the core of omnara. It's a NestJS application backed by PostgreSQL (via MikroORM) that exposes both an MCP endpoint for AI agents and a REST API for the dashboard. It manages content, sites, and all write operations.
 
-The **MCP Client** gives AI agents a structured interface to perform content operations — creating pages, updating copy, managing media, organizing taxonomies — without needing to understand the underlying data model. It is optional for users who connect via Claude.ai directly.
+The **MCP Client** is a Svelte 5 chat interface that connects directly to the MCP Server. It gives AI agents a structured environment for content operations — creating pages, updating copy, managing media, organizing taxonomies — with inline draft previews and publish controls. It is optional for users who connect Claude.ai directly.
 
-The **Dashboard** is for humans. It lets you review AI-generated content before it goes live, manage sensitive settings (API keys, integrations, access control), and maintain oversight of what the AI is doing on your behalf.
+The **Dashboard** is for humans. It shows AI activity in real time, surfaces content that needs review before going live, and manages sensitive settings (API keys, integrations, access control) that should stay out of the AI's hands.
 
 ---
 
 ## Features
 
 - **AI-native content management** — manage all content through natural language via any MCP-compatible AI agent, including Claude.ai (Pro, Max, and Teams plans)
-- **MCP Server** — standards-based MCP protocol endpoint built on Node.js, designed for scale
-- **Human oversight dashboard** — review, approve, and configure without exposing sensitive settings to AI agents
-- **Universal CMS** — serve any kind of website: blogs, storefronts, landing pages, documentation sites, or fully custom builds
-- **Headless API** — consume your content from any frontend via REST or GraphQL, the same way you would with WordPress, Shopify, or any other headless CMS
-- **Drop-in compatibility** — built to be a backend for sites that would otherwise run on WordPress, Shopify, Wix, or similar platforms
+- **MCP Server** — standards-based MCP protocol endpoint built on NestJS, exposing Tools, Resources, and Prompts to AI agents
+- **Human oversight dashboard** — review queue, activity feed, and per-site controls; approve or request changes before content goes live
+- **MCP Client** — chat interface with inline tool-call traces, draft cards, and one-click publish; sessions are persistent and labeled
+- **Multi-site support** — connect multiple sites (Shopify, WordPress, custom) to a single omnara instance; each managed independently by AI agents
+- **Headless REST API** — consume content from any frontend; same API powers the dashboard and external integrations
+- **Design system** — omnara ships its own component library (`design/`) used across both Svelte frontends
 
 ---
 
@@ -64,34 +63,44 @@ The **Dashboard** is for humans. It lets you review AI-generated content before 
 ### Prerequisites
 
 - Node.js 20+
-- A running omnara MCP Server instance
-- An MCP-compatible AI agent (e.g. Claude with MCP support)
+- pnpm 9+
+- PostgreSQL 15+
+
+### Install all workspace dependencies
+
+```bash
+pnpm install
+```
 
 ### MCP Server
 
 ```bash
-cd server
-npm install
-npm run dev
+pnpm --filter server dev
 ```
 
-The server starts on `http://localhost:3000` by default. Configure your environment in `.env`:
+The server starts on `http://localhost:3000` by default. Configure your environment in `server/.env`:
 
 ```env
 PORT=3000
-DATABASE_URL=...
-API_SECRET=...
+DATABASE_URL=postgresql://user:password@localhost:5432/omnara
+API_SECRET=your-secret-here
 ```
 
 ### MCP Client
 
 ```bash
-cd client
-npm install
-npm run dev
+pnpm --filter client dev
 ```
 
-Point your MCP-compatible agent at the client endpoint to begin managing content.
+The client starts on `http://localhost:5174`. Point your MCP-compatible agent at the client endpoint to begin managing content.
+
+### Dashboard
+
+```bash
+pnpm --filter dashboard dev
+```
+
+The dashboard is available at `http://localhost:5173`. Use it to review AI-created content, manage connected sites, and configure settings.
 
 ### Using Claude.ai as the MCP Client
 
@@ -101,23 +110,13 @@ If you have a Claude.ai **Pro, Max, or Teams** subscription, you can skip the MC
 2. In Claude.ai, go to **Settings → Integrations** and add your omnara server URL as a new MCP server
 3. Claude.ai will discover the available tools and you can start managing content directly from the chat interface
 
-### Dashboard
-
-```bash
-cd dashboard
-npm install
-npm run dev
-```
-
-The dashboard is available at `http://localhost:5173`. Use it to review AI-created content, manage integrations, and configure settings that should stay out of the AI's hands.
-
 ---
 
 ## Use Cases
 
 - **Replace WordPress** — use omnara as a headless backend; let your AI agent write and publish posts while you review them in the dashboard
 - **Headless storefront** — manage product copy, descriptions, and landing pages through an AI agent integrated into your workflow
-- **Custom website backend** — build any frontend on top of omnara's API; the AI handles the content operations
+- **Custom website backend** — build any frontend on top of omnara's REST API; the AI handles the content operations
 - **Multi-site management** — one omnara instance can serve multiple sites, each managed independently by AI agents
 
 ---
@@ -126,21 +125,47 @@ The dashboard is available at `http://localhost:5173`. Use it to review AI-creat
 
 ```
 omnara/
-├── server/        # MCP Server (Node.js)
-├── client/        # MCP Client (Svelte)
-├── dashboard/     # Management dashboard (Svelte)
-└── docs/          # Documentation
+├── server/             # NestJS MCP Server
+│   └── src/
+│       ├── modules/    # Feature modules (content, auth, sites, …)
+│       └── main.ts
+├── client/             # SvelteKit MCP Client (agent chat interface)
+│   └── src/
+│       ├── routes/     # SvelteKit pages (client-only)
+│       └── lib/
+├── dashboard/          # SvelteKit Management Dashboard
+│   └── src/
+│       ├── routes/     # SvelteKit pages (client-only)
+│       └── lib/
+├── design/             # omnara Design System (component library + UI kits)
+└── docs/
+```
+
+---
+
+## Development
+
+This repo uses **pnpm workspaces**. Common commands:
+
+```bash
+pnpm install                          # install all workspace dependencies
+pnpm --filter server add <pkg>        # add a dependency to a specific package
+pnpm --filter dashboard dev           # run a dev server for a specific package
+pnpm -r test                          # run tests across all packages
+pnpm -r build                         # build all packages
 ```
 
 ---
 
 ## Roadmap
 
-- [ ] MCP Server — core content API
-- [ ] MCP Client — agent interface
-- [ ] Dashboard — review and settings UI
-- [ ] Plugin system for custom content types
-- [ ] Multi-tenant support
+- [ ] MCP Server — core content API (NestJS + MikroORM)
+- [ ] MCP Tools — create, update, delete, list, publish content
+- [ ] MCP Resources — site schema, content type definitions
+- [ ] MCP Client — agent chat interface with session management
+- [ ] Dashboard — review queue, activity feed, site management
+- [ ] Authentication — API key and JWT-based auth
+- [ ] Multi-site support
 - [ ] WordPress migration tool
 - [ ] Shopify compatibility layer
 
