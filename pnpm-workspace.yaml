@@ -3,6 +3,8 @@ packages:
   - 'client'
   - 'dashboard'
 allowBuilds:
+  argon2: true
   esbuild: true
 onlyBuiltDependencies:
   - esbuild
+  - argon2
