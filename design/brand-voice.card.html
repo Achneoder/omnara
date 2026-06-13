@@ -1,0 +1,8 @@
+Multi-line field for content bodies and agent prompts. Use `mono` for JSON/code/MCP payloads.
+
+```jsx
+<Textarea label="Prompt" placeholder="Tell omnara what to change…" />
+<Textarea label="Schema override" mono defaultValue={'{ "type": "page" }'} />
+```
+
+Props: `label`, `hint`, `error`, `mono`. Forwards native textarea attributes; resizes vertically.

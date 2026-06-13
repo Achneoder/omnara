@@ -1,0 +1,48 @@
+import React from "react";
+
+const css = `
+.om-tabs{display:flex;align-items:center;gap:2px;border-bottom:1px solid var(--border-subtle);
+  font-family:var(--font-sans)}
+.om-tabs--pill{border-bottom:none;background:var(--bg-subtle);padding:3px;border-radius:var(--radius-md);
+  gap:2px;display:inline-flex}
+.om-tab{appearance:none;border:none;background:transparent;cursor:pointer;
+  font-size:var(--text-sm);font-weight:var(--weight-medium);color:var(--text-muted);
+  padding:10px 12px;display:inline-flex;align-items:center;gap:7px;position:relative;
+  transition:var(--transition-colors)}
+.om-tab svg{width:16px;height:16px}
+.om-tab:hover{color:var(--text-strong)}
+.om-tab--active{color:var(--text-strong)}
+.om-tabs:not(.om-tabs--pill) .om-tab--active::after{content:"";position:absolute;left:8px;right:8px;
+  bottom:-1px;height:2px;border-radius:2px;background:var(--accent)}
+.om-tabs--pill .om-tab{border-radius:var(--radius-sm);padding:7px 14px}
+.om-tabs--pill .om-tab--active{background:var(--surface);color:var(--text-strong);box-shadow:var(--shadow-xs)}
+.om-tab__count{font-family:var(--font-mono);font-size:var(--text-2xs);color:var(--text-faint);
+  background:var(--bg-sunken);border-radius:var(--radius-full);padding:1px 6px}
+`;
+
+if (typeof document !== "undefined" && !document.getElementById("om-tabs-css")) {
+  const s = document.createElement("style");
+  s.id = "om-tabs-css";
+  s.textContent = css;
+  document.head.appendChild(s);
+}
+
+export function Tabs({ items = [], value, onChange, variant = "underline", className = "" }) {
+  const cls = ["om-tabs", variant === "pill" ? "om-tabs--pill" : "", className].filter(Boolean).join(" ");
+  return (
+    <div className={cls} role="tablist">
+      {items.map((it) => {
+        const active = it.value === value;
+        return (
+          <button key={it.value} role="tab" aria-selected={active}
+            className={["om-tab", active ? "om-tab--active" : ""].filter(Boolean).join(" ")}
+            onClick={() => onChange && onChange(it.value)}>
+            {it.icon}
+            {it.label}
+            {it.count != null && <span className="om-tab__count">{it.count}</span>}
+          </button>
+        );
+      })}
+    </div>
+  );
+}

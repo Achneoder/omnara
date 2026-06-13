@@ -1,0 +1,19 @@
+# UI kit · MCP Client
+
+The **developer-facing** omnara surface (dark theme). In production this is the Svelte MCP Client that talks to the Node.js MCP Server; recreated here in React composing the design-system primitives. A command/conversation interface where you ask the agent to draft, edit, diff, and publish content — and watch the MCP tool calls go by.
+
+## Layout (`index.html` is interactive)
+- **Sessions sidebar** — session list, live connection tree (sites + platforms), MCP server status (`connected · stdio`).
+- **Agent thread** — alternating you / omnara turns. Agent turns render **tool-call blocks** (mono `→ call` / `← ok result`) and **draft cards** (amber spark badge + View diff / Send to review / Publish).
+- **Composer** — suggestion chips + a `›` mono-prompted command input. Sending (or clicking a chip) appends a scripted agent reply with the matching tool call.
+
+## Files
+- `index.html` — dark layout CSS + interactive app (message state, scripted replies).
+- `parts.jsx` — `ClientSidebar`, `Message`, `ToolCall`, `DraftCard`.
+
+## Components used
+Avatar (incl. `agent`), Badge, Tag, Button, IconButton, Tooltip.
+
+## Notes
+- Dark theme via `data-theme="dark"` on `<body>` — the same tokens reskin every primitive.
+- Cosmetic recreation: tool calls and results are mocked, no real MCP server is contacted.

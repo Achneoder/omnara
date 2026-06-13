@@ -1,0 +1,14 @@
+<!-- @dsCard group="Type" viewport="700x180" name="Display — Space Grotesk" subtitle="Headlines & wordmark. Medium weight, tight tracking" -->
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><link rel="stylesheet" href="../styles.css">
+<style>
+  body{margin:0;background:var(--bg-base);padding:24px;font-family:var(--font-display)}
+  .d1{font:var(--type-display);color:var(--text-strong);letter-spacing:var(--tracking-tight);margin:0}
+  .d2{font:var(--type-h1);color:var(--text-strong);letter-spacing:var(--tracking-tight);margin:8px 0 0}
+  .meta{font-family:var(--font-mono);font-size:11px;color:var(--text-muted);margin-top:14px}
+</style></head>
+<body>
+  <p class="d1">Content, on autopilot.</p>
+  <p class="d2">Built by AI. Managed by AI.</p>
+  <p class="meta">Space Grotesk · 500 · tracking −0.015em · --type-display / --type-h1</p>
+</body></html>

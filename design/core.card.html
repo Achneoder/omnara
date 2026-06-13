@@ -1,0 +1,15 @@
+import * as React from "react";
+
+export interface IconButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  /** @default "ghost" */
+  variant?: "ghost" | "outline" | "solid";
+  /** @default "md" */
+  size?: "sm" | "md" | "lg";
+  /** Accessible label (also used as tooltip title) — required. */
+  label: string;
+  /** The icon node (Lucide <i> or SVG). */
+  children?: React.ReactNode;
+}
+
+/** A square button holding a single icon — toolbars, row actions, close buttons. */
+export function IconButton(props: IconButtonProps): JSX.Element;

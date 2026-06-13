@@ -1,0 +1,12 @@
+import * as React from "react";
+
+export interface TextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
+  label?: React.ReactNode;
+  hint?: React.ReactNode;
+  error?: React.ReactNode;
+  /** Render in JetBrains Mono — for prompts, JSON, code. @default false */
+  mono?: boolean;
+}
+
+/** Multi-line text field — content bodies, prompts, and code blocks. */
+export function Textarea(props: TextareaProps): JSX.Element;

@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>omnara · Design System</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  body{margin:0;background:var(--bg-base);color:var(--text-body);font-family:var(--font-sans)}
+  .wrap{max-width:980px;margin:0 auto;padding:64px 32px 80px}
+  .top{display:flex;align-items:center;gap:12px;margin-bottom:40px}
+  .top img{width:36px;height:36px}
+  .top .wm{font-family:var(--font-display);font-weight:500;font-size:24px;color:var(--text-strong);letter-spacing:-.02em}
+  .top .chip{margin-left:auto;font-family:var(--font-mono);font-size:11px;color:var(--text-muted);
+    border:1px solid var(--border-default);border-radius:var(--radius-full);padding:4px 11px}
+  .eyebrow{font:var(--type-eyebrow);letter-spacing:var(--tracking-caps);text-transform:uppercase;color:var(--text-muted);margin-bottom:14px}
+  .hero h1{font-family:var(--font-display);font-weight:500;font-size:54px;line-height:1.05;letter-spacing:-.02em;
+    color:var(--text-strong);margin:0 0 16px;max-width:14ch}
+  .hero p{font:var(--type-body);font-size:17px;color:var(--text-muted);max-width:56ch;margin:0}
+  .hero .pulse{color:var(--accent)}
+  .sec{margin-top:56px}
+  .sec h2{font:var(--type-h3);color:var(--text-strong);margin-bottom:4px}
+  .sec .lead{font-size:13px;color:var(--text-muted);margin-bottom:18px}
+  .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+  .card{display:flex;flex-direction:column;gap:8px;text-decoration:none;background:var(--surface);
+    border:1px solid var(--border-subtle);border-radius:var(--radius-lg);padding:20px;
+    transition:border-color var(--duration-fast),box-shadow var(--duration-fast),transform var(--duration-fast) var(--ease-out)}
+  .card:hover{border-color:var(--border-strong);box-shadow:var(--shadow-md);transform:translateY(-1px);text-decoration:none}
+  .card .ic{width:36px;height:36px;border-radius:var(--radius-md);background:var(--accent-soft);color:var(--accent-soft-text);
+    display:flex;align-items:center;justify-content:center}
+  .card .ic svg{width:19px;height:19px}
+  .card b{color:var(--text-strong);font-size:15px;font-weight:600}
+  .card span{font-size:13px;color:var(--text-muted);line-height:1.5}
+  .card .meta{margin-top:2px;font-family:var(--font-mono);font-size:11px;color:var(--text-faint)}
+  .quad{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:8px}
+  .tok{border:1px solid var(--border-subtle);border-radius:var(--radius-md);overflow:hidden;background:var(--surface)}
+  .tok .bar{height:40px}
+  .tok .lab{padding:8px 10px;font-family:var(--font-mono);font-size:10px;color:var(--text-muted)}
+  .note{margin-top:56px;padding:16px 18px;border:1px dashed var(--border-default);border-radius:var(--radius-lg);
+    font-size:13px;color:var(--text-muted);line-height:1.6}
+  .note b{color:var(--text-body)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <img src="assets/omnara-mark.svg" alt="">
+    <span class="wm">omnara</span>
+    <span class="chip">design system · v0.42</span>
+  </div>
+
+  <div class="hero">
+    <div class="eyebrow">The AI-driven CMS</div>
+    <h1>Content, on <span class="pulse">autopilot</span>.</h1>
+    <p>A design system for omnara — built by AI, managed by AI. One signal-green accent on warm paper, an editorial-meets-terminal type system, and components shared across the developer MCP Client and the human management Dashboard.</p>
+  </div>
+
+  <div class="quad">
+    <div class="tok"><div class="bar" style="background:var(--signal-500)"></div><div class="lab">--accent · signal</div></div>
+    <div class="tok"><div class="bar" style="background:var(--spark-400)"></div><div class="lab">--ai · spark</div></div>
+    <div class="tok"><div class="bar" style="background:var(--stone-900)"></div><div class="lab">ink</div></div>
+    <div class="tok"><div class="bar" style="background:var(--stone-100);border-right:1px solid var(--border-subtle)"></div><div class="lab">paper</div></div>
+  </div>
+
+  <div class="sec">
+    <h2>Products</h2>
+    <div class="lead">Full interactive recreations composing the component primitives.</div>
+    <div class="grid">
+      <a class="card" href="ui_kits/dashboard/index.html">
+        <span class="ic"><i data-lucide="layout-dashboard"></i></span>
+        <b>Management Dashboard</b>
+        <span>Human-facing console — overview, content library, review queue, confidential settings.</span>
+        <span class="meta">light · ui_kits/dashboard</span>
+      </a>
+      <a class="card" href="ui_kits/mcp-client/index.html">
+        <span class="ic"><i data-lucide="terminal"></i></span>
+        <b>MCP Client</b>
+        <span>Developer-facing command interface — sessions, agent thread, tool calls, composer.</span>
+        <span class="meta">dark · ui_kits/mcp-client</span>
+      </a>
+    </div>
+  </div>
+
+  <div class="sec">
+    <h2>Templates</h2>
+    <div class="lead">Starting scaffolds to build new screens from.</div>
+    <div class="grid">
+      <a class="card" href="templates/admin-screen/index.html">
+        <span class="ic"><i data-lucide="panels-top-left"></i></span>
+        <b>Admin screen</b>
+        <span>Sidebar nav + topbar + an empty content slot.</span>
+        <span class="meta">templates/admin-screen</span>
+      </a>
+      <a class="card" href="templates/agent-session/index.html">
+        <span class="ic"><i data-lucide="message-square"></i></span>
+        <b>Agent session</b>
+        <span>Dark session sidebar + agent thread + command composer.</span>
+        <span class="meta">templates/agent-session</span>
+      </a>
+    </div>
+  </div>
+
+  <div class="sec">
+    <h2>Foundations &amp; components</h2>
+    <div class="lead">Tokens, type, color, and 16 React primitives — browse them as cards in the Design System tab.</div>
+    <div class="grid">
+      <a class="card" href="readme.md">
+        <span class="ic"><i data-lucide="book-open"></i></span>
+        <b>Design guide</b>
+        <span>Brand idea, voice &amp; tone, visual foundations, iconography, file index.</span>
+        <span class="meta">readme.md</span>
+      </a>
+      <a class="card" href="guidelines/brand-logo.card.html">
+        <span class="ic"><i data-lucide="palette"></i></span>
+        <b>Foundation cards</b>
+        <span>Color scales, the type ramp, spacing, radii, shadows, logo &amp; voice.</span>
+        <span class="meta">guidelines/</span>
+      </a>
+    </div>
+  </div>
+
+  <div class="note">
+    <b>⚠️ Authored from a written brief.</b> Fonts (Google Fonts), icons (Lucide), and the logo mark are stand-ins — replace them with real brand assets when available. See <b>readme.md → Provenance</b>.
+  </div>
+</div>
+
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<script>lucide.createIcons();</script>
+</body>
+</html>

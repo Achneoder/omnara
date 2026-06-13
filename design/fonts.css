@@ -1,0 +1,18 @@
+<!-- @dsCard group="Type" viewport="700x200" name="Body & UI — IBM Plex Sans" subtitle="The workhorse for content and interface text" -->
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><link rel="stylesheet" href="../styles.css">
+<style>
+  body{margin:0;background:var(--bg-base);padding:24px;font-family:var(--font-sans)}
+  h3{font:var(--type-h3);color:var(--text-strong);margin:0 0 6px}
+  p{font:var(--type-body);color:var(--text-body);max-width:560px;margin:0}
+  .lbl{font:var(--type-label);color:var(--text-strong);margin-top:14px}
+  .cap{font:var(--type-caption);color:var(--text-muted);margin-top:4px}
+  .meta{font-family:var(--font-mono);font-size:11px;color:var(--text-muted);margin-top:16px}
+</style></head>
+<body>
+  <h3>omnara keeps every site in sync</h3>
+  <p>The agent drafts, edits, and publishes content across WordPress, Shopify, Wix, or a custom API — you stay in the loop for anything that needs review.</p>
+  <div class="lbl">Label · medium 13px</div>
+  <div class="cap">Caption · regular 12px — metadata and helper text</div>
+  <p class="meta">IBM Plex Sans · 400 / 500 / 600 · body line-height 1.65</p>
+</body></html>

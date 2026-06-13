@@ -1,0 +1,29 @@
+---
+name: omnara-design
+description: Use this skill to generate well-branded interfaces and assets for omnara (the AI-driven CMS), either for production or throwaway prototypes/mocks/etc. Contains essential design guidelines, colors, type, fonts, assets, and UI kit components for prototyping.
+user-invocable: true
+---
+
+Read the `readme.md` file within this skill, and explore the other available files.
+
+If creating visual artifacts (slides, mocks, throwaway prototypes, etc), copy assets out and create static HTML files for the user to view. If working on production code, you can copy assets and read the rules here to become an expert in designing with this brand.
+
+If the user invokes this skill without any other guidance, ask them what they want to build or design, ask some questions, and act as an expert designer who outputs HTML artifacts _or_ production code, depending on the need.
+
+## What's here
+- `readme.md` — the full design guide: brand idea, content fundamentals (voice/tone), visual foundations, iconography, and a file index. **Read this first.**
+- `styles.css` — single global entry point. Link it and you get every token + the webfont imports. It only `@import`s the files in `tokens/`.
+- `tokens/` — colors (incl. a `[data-theme="dark"]` scope), typography, spacing, radii, shadows, motion, fonts, base.
+- `assets/` — the omnara mark (light / mono / inverse SVG).
+- `components/` — React primitives (`core/`, `forms/`, `feedback/`, `navigation/`). Each has a `.jsx`, a `.d.ts` props contract, and a `.prompt.md` usage note.
+- `guidelines/` — foundation specimen cards (`.card.html`).
+- `ui_kits/` — full-screen recreations: `dashboard/` (light, human console) and `mcp-client/` (dark, developer command interface).
+
+## Fast rules
+- Brand color is one **signal green** (`--accent`). Warm **stone** neutrals everywhere else. Amber **spark** (`--ai`) ONLY discloses AI-generated content.
+- Sentence case everywhere; **omnara** is always lowercase. Address the user as "you"; the product is "omnara". No emoji in UI.
+- Fonts: Space Grotesk (display), IBM Plex Sans (body), JetBrains Mono (code/metadata). Icons: Lucide, line only.
+- Borders do more work than shadows. Soft-precise radii. Quick motion, no bounce.
+
+## ⚠️ Substitutions to confirm
+Fonts (Google Fonts), icons (Lucide), and the logo mark are all stand-ins authored from a written brief — replace with real brand assets when available.

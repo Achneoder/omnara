@@ -1,0 +1,21 @@
+<!-- @dsCard group="Type" viewport="700x230" name="Type scale" subtitle="11 → 60px ramp with semantic roles" -->
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><link rel="stylesheet" href="../styles.css">
+<style>
+  body{margin:0;background:var(--bg-base);padding:22px;font-family:var(--font-sans)}
+  .row{display:flex;align-items:baseline;gap:16px;padding:5px 0;border-bottom:1px solid var(--border-subtle)}
+  .row:last-child{border-bottom:none}
+  .name{font-family:var(--font-mono);font-size:11px;color:var(--text-muted);width:140px;flex:0 0 auto}
+  .spec{font-family:var(--font-mono);font-size:10px;color:var(--text-faint);margin-left:auto}
+  .samp{color:var(--text-strong);font-family:var(--font-display);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+</style></head>
+<body>
+  <div class="row"><span class="name">--text-5xl</span><span class="samp" style="font-size:38px">Aa omnara</span><span class="spec">60 / display</span></div>
+  <div class="row"><span class="name">--text-3xl</span><span class="samp" style="font-size:30px">Aa omnara</span><span class="spec">36 / h1</span></div>
+  <div class="row"><span class="name">--text-2xl</span><span class="samp" style="font-size:24px">Aa omnara</span><span class="spec">28 / h2</span></div>
+  <div class="row"><span class="name">--text-xl</span><span class="samp" style="font-size:20px;font-family:var(--font-sans)">Aa omnara</span><span class="spec">22 / h3</span></div>
+  <div class="row"><span class="name">--text-md</span><span class="samp" style="font-size:16px;font-family:var(--font-sans)">Aa omnara</span><span class="spec">16 / title</span></div>
+  <div class="row"><span class="name">--text-base</span><span class="samp" style="font-size:15px;font-family:var(--font-sans)">Aa omnara</span><span class="spec">15 / body</span></div>
+  <div class="row"><span class="name">--text-sm</span><span class="samp" style="font-size:13px;font-family:var(--font-sans)">Aa omnara</span><span class="spec">13 / label</span></div>
+  <div class="row"><span class="name">--text-xs</span><span class="samp" style="font-size:12px;font-family:var(--font-sans)">Aa omnara</span><span class="spec">12 / caption</span></div>
+</body></html>
