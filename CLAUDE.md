@@ -162,6 +162,29 @@ All code must be covered by tests. Tests are not optional.
 
 ---
 
+## Package Manager
+
+This repo uses **pnpm** with workspaces. Never use `npm` or `yarn`.
+
+```yaml
+# pnpm-workspace.yaml
+packages:
+  - server
+  - client
+  - dashboard
+```
+
+Common commands:
+
+```bash
+pnpm install                        # install all workspace dependencies
+pnpm --filter server add <pkg>      # add a dependency to a specific package
+pnpm --filter dashboard dev         # run a script in a specific package
+pnpm -r test                        # run tests across all packages
+```
+
+---
+
 ## Project Structure
 
 ```
