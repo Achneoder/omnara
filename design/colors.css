@@ -1,0 +1,19 @@
+<!-- @dsCard group="Spacing" viewport="700x170" name="Spacing scale" subtitle="4px base grid — use --space-* for padding, gaps, margins" -->
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><link rel="stylesheet" href="../styles.css">
+<style>
+  body{margin:0;background:var(--bg-base);padding:22px;font-family:var(--font-mono)}
+  .row{display:flex;align-items:center;gap:14px;margin-bottom:8px}
+  .bar{height:14px;background:var(--accent);border-radius:2px}
+  .n{font-size:11px;color:var(--text-muted);width:88px}
+</style></head>
+<body>
+  <div class="row"><span class="n">--space-1 · 4</span><span class="bar" style="width:4px"></span></div>
+  <div class="row"><span class="n">--space-2 · 8</span><span class="bar" style="width:8px"></span></div>
+  <div class="row"><span class="n">--space-3 · 12</span><span class="bar" style="width:12px"></span></div>
+  <div class="row"><span class="n">--space-4 · 16</span><span class="bar" style="width:16px"></span></div>
+  <div class="row"><span class="n">--space-6 · 24</span><span class="bar" style="width:24px"></span></div>
+  <div class="row"><span class="n">--space-7 · 32</span><span class="bar" style="width:32px"></span></div>
+  <div class="row"><span class="n">--space-9 · 48</span><span class="bar" style="width:48px"></span></div>
+  <div class="row"><span class="n">--space-10 · 64</span><span class="bar" style="width:64px"></span></div>
+</body></html>

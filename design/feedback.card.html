@@ -1,0 +1,16 @@
+Modal dialog for confirmations and focused tasks — publish confirmation, connect-a-site, destructive actions.
+
+```jsx
+<Dialog open={open} title="Publish to production?"
+  description="omnara will push 3 pages to shop.example.com."
+  icon={<i data-lucide="check-check" />}
+  onClose={() => setOpen(false)}
+  footer={<>
+    <Button variant="ghost" onClick={() => setOpen(false)}>Cancel</Button>
+    <Button variant="primary">Publish changes</Button>
+  </>}>
+  <p>This can be reverted from version history.</p>
+</Dialog>
+```
+
+Props: `open`, `title`, `description`, `icon`, `size (md|lg)`, `footer`, `onClose`. Controlled — you own `open`.

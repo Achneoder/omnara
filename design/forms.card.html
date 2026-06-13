@@ -1,0 +1,52 @@
+import React from "react";
+
+const css = `
+.om-select-field{display:flex;flex-direction:column;gap:6px;font-family:var(--font-sans)}
+.om-select-field .om-field__label{font:var(--type-label);color:var(--text-strong)}
+.om-select-field .om-field__hint{font:var(--type-caption);color:var(--text-muted)}
+.om-select-wrap{position:relative;display:flex;align-items:center}
+.om-select{appearance:none;width:100%;background:var(--surface);
+  border:1px solid var(--border-default);border-radius:var(--radius-md);
+  font:var(--type-body);color:var(--text-strong);cursor:pointer;
+  transition:var(--transition-colors),box-shadow var(--duration-fast) var(--ease-standard)}
+.om-select--sm{height:32px;padding:0 34px 0 10px;font-size:var(--text-sm)}
+.om-select--md{height:40px;padding:0 38px 0 12px;font-size:var(--text-base)}
+.om-select:hover{border-color:var(--border-strong)}
+.om-select:focus{outline:none;border-color:var(--border-focus);box-shadow:var(--shadow-focus)}
+.om-select[disabled]{opacity:.55;background:var(--bg-subtle);cursor:not-allowed}
+.om-select-chevron{position:absolute;right:12px;pointer-events:none;color:var(--text-muted);
+  display:inline-flex}
+.om-select-chevron svg{width:16px;height:16px}
+`;
+
+if (typeof document !== "undefined" && !document.getElementById("om-select-css")) {
+  const s = document.createElement("style");
+  s.id = "om-select-css";
+  s.textContent = css;
+  document.head.appendChild(s);
+}
+
+let _id = 0;
+export function Select({ label, hint, size = "md", options, id, className = "", children, ...rest }) {
+  const fieldId = id || `om-sel-${++_id}`;
+  return (
+    <div className={["om-select-field", className].filter(Boolean).join(" ")}>
+      {label && <label className="om-field__label" htmlFor={fieldId}>{label}</label>}
+      <div className="om-select-wrap">
+        <select id={fieldId} className={`om-select om-select--${size}`} {...rest}>
+          {options
+            ? options.map((o) => {
+                const opt = typeof o === "string" ? { value: o, label: o } : o;
+                return <option key={opt.value} value={opt.value}>{opt.label}</option>;
+              })
+            : children}
+        </select>
+        <span className="om-select-chevron" aria-hidden="true">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.8"
+            strokeLinecap="round" strokeLinejoin="round"><path d="M4 6l4 4 4-4" /></svg>
+        </span>
+      </div>
+      {hint && <span className="om-field__hint">{hint}</span>}
+    </div>
+  );
+}

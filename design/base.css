@@ -1,0 +1,18 @@
+<!-- @dsCard group="Spacing" viewport="700x180" name="Elevation & shadows" subtitle="Warm, low-spread. Borders do more work than shadows" -->
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><link rel="stylesheet" href="../styles.css">
+<style>
+  body{margin:0;background:var(--bg-subtle);padding:28px 22px;font-family:var(--font-mono);
+    display:flex;gap:24px;align-items:center}
+  .item{text-align:center}
+  .box{width:96px;height:64px;background:var(--surface);border:1px solid var(--border-subtle);
+    border-radius:var(--radius-lg)}
+  .n{font-size:10px;color:var(--text-muted);margin-top:10px}
+</style></head>
+<body>
+  <div class="item"><div class="box" style="box-shadow:var(--shadow-xs)"></div><div class="n">xs</div></div>
+  <div class="item"><div class="box" style="box-shadow:var(--shadow-sm)"></div><div class="n">sm · cards</div></div>
+  <div class="item"><div class="box" style="box-shadow:var(--shadow-md)"></div><div class="n">md · popover</div></div>
+  <div class="item"><div class="box" style="box-shadow:var(--shadow-lg)"></div><div class="n">lg · toast</div></div>
+  <div class="item"><div class="box" style="box-shadow:var(--shadow-xl)"></div><div class="n">xl · dialog</div></div>
+</body></html>

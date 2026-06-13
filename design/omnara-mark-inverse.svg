@@ -1,0 +1,124 @@
+# omnara Design System
+
+**omnara — the AI-driven CMS.** A content management system that is not only *built* by AI but *operated* by AI. Editors and developers talk to their content through an MCP (Model Context Protocol) layer; humans step in through a management dashboard to review AI-generated work and own the confidential settings they don't want an agent touching.
+
+omnara is platform-agnostic: it can drive WordPress, Shopify, Wix, or a fully custom site through its API. The design system exists to keep every omnara surface — the developer-facing MCP Client and the human-facing management Dashboard — visually and behaviorally consistent across platforms and devices.
+
+---
+
+## ⚠️ Provenance & substitutions (please read)
+
+This system was authored **from a written product brief only** — no codebase, Figma file, logo, or font files were provided. Every visual decision below is an *original proposal* for omnara, not a recreation of an existing brand. The following were invented or substituted and should be confirmed/replaced:
+
+- **Brand mark** (`assets/omnara-mark*.svg`) — an original geometric "live node" mark. Replace with the real logo if one exists.
+- **Fonts** — Google Fonts stand-ins: **Space Grotesk** (display), **IBM Plex Sans** (body/UI), **JetBrains Mono** (code). Swap for licensed brand fonts when available.
+- **Icons** — **Lucide** (CDN), chosen for its clean, even-stroke developer aesthetic. Replace if omnara ships its own icon set.
+- **Color & tone** — proposed, not sourced.
+
+**Sources given:** product description only (AI-driven CMS; Node.js MCP Server; Svelte MCP Client; Svelte management Dashboard; multi-platform: WordPress/Shopify/Wix/custom). No repos or design links were supplied.
+
+---
+
+## Brand idea
+
+**"Calm machinery."** omnara puts an autonomous system in charge of something people care deeply about — their content — so the brand has to feel *trustworthy, legible, and editorial* rather than flashy or robotic. The visual language borrows from two worlds:
+
+- **Editorial / paper** — warm off-white grounds, generous type, a content-first calm.
+- **Terminal / protocol** — monospace metadata, a vivid "signal" green for anything live or AI-active, and exact, hairline structure.
+
+The signature move is the contrast between *warm human paper* and *precise green signal*. Green = the machine is working. Amber "spark" = this was made by AI (always disclosed, never hidden).
+
+---
+
+## CONTENT FUNDAMENTALS
+
+**Voice:** plain-spoken, technical, quietly confident. omnara is an instrument, not a personality — it does not have a cute mascot voice and does not over-explain.
+
+- **Person:** Address the user as **you**. The product refers to itself as **omnara** or **the agent**, never "I" in a chatty way. ("omnara published 3 pages." not "I published your pages!")
+- **Casing:** **Sentence case everywhere** — buttons, menus, headings, titles. Never Title Case UI. The brand name **omnara is always lowercase**, even at the start of a sentence where possible.
+- **Tone examples:**
+  - Button: `Publish changes` · `Review draft` · `Connect a site`
+  - Empty state: `No content yet. Ask omnara to draft your first page.`
+  - AI disclosure: `Drafted by omnara · review before publishing`
+  - Status: `Live` · `Syncing…` · `Needs review` · `Reverted`
+  - Error: `Couldn't reach the MCP server. Retrying in 5s.` (state what happened + what's next; no blame, no exclamation)
+- **Numbers & metadata** are set in mono: `v0.42`, `MCP · stdio`, `1,204 items`, `2s ago`.
+- **Emoji:** none in product UI. The green signal dot and Lucide icons carry all the affect needed.
+- **Punctuation:** sparing. Periods on full sentences; none on labels/buttons. Use the middot `·` to join metadata. Ellipsis `…` for in-progress states.
+- **Vibe:** like reading a well-kept changelog — terse, accurate, never hyped.
+
+---
+
+## VISUAL FOUNDATIONS
+
+**Color.** Warm **stone** neutrals (paper `#FAF8F3` → ink `#0F0E0B`) carry the system. A single vivid **signal green** (`--signal-500 #12B265`) is the only true brand color — used for primary actions, selection, focus, and any "live / AI-active" indicator. An **amber spark** (`--spark-400`) is reserved *exclusively* for marking AI-generated content. Semantic red/amber/blue are flat and quiet. Avoid gradients as decoration; the palette does the work. A dark theme (`[data-theme="dark"]`) reskins the MCP Client.
+
+**Type.** Display in **Space Grotesk** (medium weight, tight tracking) for headlines and the wordmark. Body/UI in **IBM Plex Sans**. **JetBrains Mono** for code, labels, eyebrows, metadata, and anything on the MCP wire. Eyebrows are uppercase mono with wide tracking (`--tracking-caps`). Headlines are set tight; body is set relaxed (1.65) for content legibility.
+
+**Spacing.** 4px base grid (`--space-*`). Layouts breathe — generous gutters, real whitespace. Use flex/grid with `gap`, never margin chains.
+
+**Backgrounds.** Flat warm paper, no imagery behind text. Structure comes from hairline borders and subtle surface steps (`--bg-base` → `--bg-subtle` → `--surface`), not drop shadows or gradients. No textures, no full-bleed photos in chrome. Marketing surfaces may use a single product screenshot, never stock photography.
+
+**Borders.** Hairline 1px (`--border-subtle/-default`) define almost every edge. The brand reads "drawn with a fine pen." Focus borders go signal green.
+
+**Radii.** Soft but precise: `--radius-md (8px)` for buttons/fields, `--radius-lg (12px)` for cards, `--radius-xs (4px)` for code chips, full pills for status badges.
+
+**Cards** = `--surface` (white / dark surface) + 1px `--border-subtle` + `--radius-lg` + at most `--shadow-sm`. Elevation is restrained; cards mostly sit flat and rely on borders. Reserve `--shadow-lg/-xl` for true overlays (dialogs, popovers).
+
+**Shadows.** Warm-tinted, low-spread, layered ambient. Light theme uses them sparingly; dark theme deepens them. Borders do more work than shadows.
+
+**Motion.** Quick and confident — `--duration-fast (140ms)` for most state changes, `--ease-out` for entrances. **No bounce, no spring overshoot.** Fades and 2–6px slide-ins only. The "live" green dot may pulse gently; nothing else loops.
+
+**Hover** = subtle surface darken / tint shift (never scale-up). **Press** = brief darken to `--accent-press` (no shrink on buttons; a 1px translate is acceptable on cards). Disabled = 45% opacity, no pointer.
+
+**Transparency & blur:** used only for overlay scrims (`color-mix` ink at ~40%) and the topbar on scroll. Not decorative.
+
+**Imagery vibe:** when product screenshots appear, keep them true-color and crisp — no filters, no grain, no warm/cool grading. The chrome is warm; the content stays honest.
+
+---
+
+## ICONOGRAPHY
+
+omnara uses **[Lucide](https://lucide.dev)** (open-source, MIT) — even 2px stroke, rounded joins, 24px grid. *Substitution flag: chosen as a stand-in; no brand icon set was provided.* Load from CDN:
+
+```html
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<script>lucide.createIcons();</script>
+```
+
+Use `<i data-lucide="name"></i>` and size via `width/height` (default 18–20px in UI, stroke inherits `currentColor`).
+
+- **Style:** line icons only — never filled, never duotone, never emoji in product UI.
+- **Recurring icons:** `sparkles` (AI action), `circle` / live green dot (status), `git-branch` (versions), `globe` (sites/platforms), `server` (MCP server), `terminal` (MCP client), `file-text` (content), `shield` (confidential settings), `check-check` (published), `rotate-ccw` (revert).
+- **The mark** (`assets/omnara-mark.svg`) is a brand element, not an icon — don't use it inline in menus.
+- **Unicode** used sparingly as typographic devices only: middot `·` for metadata, `→` for flow/next.
+
+---
+
+## Index / manifest
+
+**Root**
+- `styles.css` — global entry point (consumers link this). `@import` manifest only.
+- `tokens/` — `colors · typography · spacing · radii · shadows · motion · fonts · base`
+- `assets/` — `omnara-mark.svg`, `omnara-mark-mono.svg`, `omnara-mark-inverse.svg`
+- `readme.md` (this file) · `SKILL.md`
+
+**Foundation cards** — `guidelines/` (Type, Colors, Spacing, Brand specimen cards)
+
+**Components** — `components/` (see the Design System tab → Components)
+- `core/` — Button, IconButton, Badge, Tag, Card, Avatar
+- `forms/` — Input, Textarea, Select, Switch, Checkbox
+- `feedback/` — Dialog, Toast, Tooltip
+- `navigation/` — Tabs
+
+**UI kits** — `ui_kits/`
+- `mcp-client/` — the developer-facing content command interface (dark theme)
+- `dashboard/` — the human-facing management dashboard (light theme)
+
+**Templates** (starting points consuming projects can copy) — `templates/`
+- `admin-screen/` — light management-console scaffold (sidebar + topbar + empty content slot)
+- `agent-session/` — dark MCP-client scaffold (session sidebar + agent thread + composer)
+
+**Cover** — `cover.html` — branded overview / landing for this system.
+
+> Namespace for `window.<Namespace>.<Component>` in card HTML is reported by `check_design_system`.

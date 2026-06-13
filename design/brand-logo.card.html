@@ -1,0 +1,43 @@
+import React from "react";
+
+const css = `
+.om-textarea-field{display:flex;flex-direction:column;gap:6px;font-family:var(--font-sans)}
+.om-textarea-field .om-field__label{font:var(--type-label);color:var(--text-strong);display:flex;gap:6px;align-items:center}
+.om-textarea-field .om-field__hint{font:var(--type-caption);color:var(--text-muted)}
+.om-textarea-field .om-field__hint--error{color:var(--danger)}
+.om-textarea{width:100%;background:var(--surface);border:1px solid var(--border-default);
+  border-radius:var(--radius-md);padding:10px 12px;font:var(--type-body);color:var(--text-strong);
+  resize:vertical;min-height:88px;
+  transition:var(--transition-colors),box-shadow var(--duration-fast) var(--ease-standard)}
+.om-textarea:hover{border-color:var(--border-strong)}
+.om-textarea:focus{outline:none;border-color:var(--border-focus);box-shadow:var(--shadow-focus)}
+.om-textarea::placeholder{color:var(--text-faint)}
+.om-textarea--mono{font-family:var(--font-mono);font-size:var(--text-sm)}
+.om-textarea--error{border-color:var(--danger)}
+.om-textarea[disabled]{opacity:.55;background:var(--bg-subtle)}
+`;
+
+if (typeof document !== "undefined" && !document.getElementById("om-textarea-css")) {
+  const s = document.createElement("style");
+  s.id = "om-textarea-css";
+  s.textContent = css;
+  document.head.appendChild(s);
+}
+
+let _id = 0;
+export function Textarea({ label, hint, error, mono = false, id, className = "", ...rest }) {
+  const fieldId = id || `om-ta-${++_id}`;
+  const taCls = ["om-textarea", mono ? "om-textarea--mono" : "", error ? "om-textarea--error" : ""]
+    .filter(Boolean).join(" ");
+  return (
+    <div className={["om-textarea-field", className].filter(Boolean).join(" ")}>
+      {label && <label className="om-field__label" htmlFor={fieldId}>{label}</label>}
+      <textarea id={fieldId} className={taCls} aria-invalid={!!error} {...rest} />
+      {(hint || error) && (
+        <span className={["om-field__hint", error ? "om-field__hint--error" : ""].filter(Boolean).join(" ")}>
+          {error || hint}
+        </span>
+      )}
+    </div>
+  );
+}

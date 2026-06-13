@@ -1,0 +1,115 @@
+/* omnara MCP Client — parts (dark theme) */
+const C = window.OmnaraDesignSystem_c73439;
+const { Avatar, Badge, Tag, Button, IconButton, Tooltip } = C;
+const ic = (n) => <i data-lucide={n}></i>;
+
+const SESSIONS = [
+  { id: "s1", t: "Summer collection launch", when: "now", active: true },
+  { id: "s2", t: "Migrate blog to WordPress", when: "2h" },
+  { id: "s3", t: "Fix product SEO", when: "yesterday" },
+];
+const CONNS = [
+  { host: "shop.example.com", plat: "shopify", ok: true },
+  { host: "journal.example.com", plat: "wordpress", ok: true },
+  { host: "studio.example.io", plat: "custom", ok: false },
+];
+
+function ClientSidebar() {
+  return (
+    <aside className="mcp__side">
+      <div className="mcp__brand">
+        <img src="../../assets/omnara-mark-inverse.svg" width="24" height="24" alt="" />
+        <span className="mcp__wm">omnara</span>
+        <span className="mcp__tagchip">MCP client</span>
+      </div>
+      <Button variant="secondary" size="sm" fullWidth iconLeft={ic("plus")}>New session</Button>
+
+      <div className="mcp__eyebrow">Sessions</div>
+      <div className="mcp__sessions">
+        {SESSIONS.map((s) => (
+          <button key={s.id} className={"mcp__session" + (s.active ? " is-active" : "")}>
+            {ic("message-square")}
+            <span className="mcp__session-t">{s.t}</span>
+            <span className="mcp__session-w">{s.when}</span>
+          </button>
+        ))}
+      </div>
+
+      <div className="mcp__eyebrow">Connections</div>
+      <div className="mcp__conns">
+        {CONNS.map((c) => (
+          <div className="mcp__conn" key={c.host}>
+            <span className="dot" style={{ background: c.ok ? "var(--success)" : "var(--text-faint)" }}></span>
+            <span className="mcp__conn-h">{c.host}</span>
+            <span className="mcp__conn-p">{c.plat}</span>
+          </div>
+        ))}
+      </div>
+
+      <div className="mcp__server">
+        <Avatar agent size="sm" />
+        <div className="mcp__server-m">
+          <b>MCP server</b>
+          <span><span className="dot" style={{ background: "var(--success)" }}></span> connected · stdio</span>
+        </div>
+      </div>
+    </aside>
+  );
+}
+
+function ToolCall({ call, result }) {
+  return (
+    <div className="tool">
+      <div className="tool__call"><span className="arrow">→</span> {call}</div>
+      {result && <div className="tool__res"><span className="ok">← ok</span> {result}</div>}
+    </div>
+  );
+}
+
+function DraftCard({ title, meta, body, onReview, onPublish }) {
+  return (
+    <div className="draft">
+      <div className="draft__head">
+        <Badge variant="ai">{ic("sparkles")}draft</Badge>
+        <span className="draft__title">{title}</span>
+        <span className="draft__meta">{meta}</span>
+      </div>
+      <p className="draft__body">{body}</p>
+      <div className="draft__act">
+        <Button size="sm" variant="ghost" iconLeft={ic("git-compare")}>View diff</Button>
+        <Button size="sm" variant="secondary" onClick={onReview}>Send to review</Button>
+        <Button size="sm" variant="primary" iconLeft={ic("check-check")} onClick={onPublish}>Publish</Button>
+      </div>
+    </div>
+  );
+}
+
+function Message({ m, onReview, onPublish }) {
+  if (m.role === "user") {
+    return (
+      <div className="msg msg--user">
+        <Avatar name="Dana Reyes" size="sm" />
+        <div className="msg__body">
+          <div className="msg__name">you</div>
+          <div className="msg__text">{m.text}</div>
+        </div>
+      </div>
+    );
+  }
+  return (
+    <div className="msg msg--agent">
+      <Avatar agent size="sm" />
+      <div className="msg__body">
+        <div className="msg__name">omnara</div>
+        {m.blocks.map((b, i) => {
+          if (b.type === "text") return <div className="msg__text" key={i}>{b.text}</div>;
+          if (b.type === "tool") return <ToolCall key={i} call={b.call} result={b.result} />;
+          if (b.type === "draft") return <DraftCard key={i} {...b} onReview={onReview} onPublish={onPublish} />;
+          return null;
+        })}
+      </div>
+    </div>
+  );
+}
+
+Object.assign(window, { ClientSidebar, Message, ToolCall, DraftCard });

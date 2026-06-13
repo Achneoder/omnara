@@ -1,0 +1,23 @@
+import * as React from "react";
+
+export interface TabItem {
+  value: string;
+  label: React.ReactNode;
+  /** Optional leading icon node. */
+  icon?: React.ReactNode;
+  /** Optional count chip (e.g. unreviewed items). */
+  count?: number;
+}
+
+export interface TabsProps {
+  items: TabItem[];
+  /** Active tab value (controlled). */
+  value: string;
+  onChange?: (value: string) => void;
+  /** @default "underline" */
+  variant?: "underline" | "pill";
+  className?: string;
+}
+
+/** Tab switcher — underline for page sections, pill for compact filters. */
+export function Tabs(props: TabsProps): JSX.Element;

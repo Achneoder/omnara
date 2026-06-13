@@ -1,0 +1,21 @@
+<!-- @dsCard group="Brand" viewport="700x200" name="Logo & wordmark" subtitle="Mark + Space Grotesk wordmark — light, dark & mono" -->
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><link rel="stylesheet" href="../styles.css">
+<style>
+  body{margin:0;background:var(--bg-base);padding:24px;font-family:var(--font-display);display:flex;flex-direction:column;gap:16px}
+  .lock{display:flex;align-items:center;gap:12px}
+  .lock img{width:34px;height:34px}
+  .wm{font-size:26px;font-weight:500;letter-spacing:-0.02em;color:var(--text-strong)}
+  .panel{display:flex;gap:36px;align-items:center}
+  .dark{background:var(--stone-900);border-radius:var(--radius-lg);padding:16px 22px}
+  .dark .wm{color:var(--stone-50)}
+  .meta{font-family:var(--font-mono);font-size:11px;color:var(--text-muted);margin-top:4px}
+</style></head>
+<body>
+  <div class="panel">
+    <div class="lock"><img src="../assets/omnara-mark.svg" alt=""><span class="wm">omnara</span></div>
+    <div class="lock dark"><img src="../assets/omnara-mark-inverse.svg" alt=""><span class="wm">omnara</span></div>
+    <div class="lock"><img src="../assets/omnara-mark.svg" alt=""></div>
+  </div>
+  <div class="meta">wordmark always lowercase · clear space = mark height · green node signals "live"</div>
+</body></html>

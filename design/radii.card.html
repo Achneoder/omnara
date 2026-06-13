@@ -1,0 +1,12 @@
+Tab switcher. `underline` for primary page sections, `pill` for compact in-card filters. Controlled via `value`/`onChange`.
+
+```jsx
+const [tab, setTab] = React.useState("review");
+<Tabs value={tab} onChange={setTab} items={[
+  { value: "all", label: "All content" },
+  { value: "review", label: "Needs review", count: 4, icon: <i data-lucide="eye" /> },
+  { value: "live", label: "Live" },
+]} />
+```
+
+Props: `items` (`{value,label,icon?,count?}`), `value`, `onChange`, `variant (underline|pill)`.
