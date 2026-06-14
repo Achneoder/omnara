@@ -1,6 +1,7 @@
 import 'dotenv/config';
 import { defineConfig } from '@mikro-orm/postgresql';
 import { Migrator } from '@mikro-orm/migrations';
+import { ReflectMetadataProvider } from '@mikro-orm/decorators/legacy';
 import * as path from 'path';
 
 export default defineConfig({
@@ -16,5 +17,6 @@ export default defineConfig({
     pathTs: path.join(__dirname, '..', 'migrations'),
     glob: '!(*.d).{js,ts}',
   },
+  metadataProvider: ReflectMetadataProvider,
   extensions: [Migrator],
 });
