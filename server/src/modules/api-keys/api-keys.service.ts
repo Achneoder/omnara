@@ -63,4 +63,26 @@ export class ApiKeysService {
     key.revokedAt = new Date();
     await this.em.flush();
   }
+
+  /**
+   * Validates a raw API key against all non-revoked keys in the database.
+   * Returns the matching ApiKey entity (with site populated) or null if no match.
+   *
+   * Uses argon2 verification so this involves a hash comparison per key.
+   * Callers should update lastUsedAt on the returned key after a successful match.
+   */
+  async validateKey(rawKey: string): Promise<ApiKey | null> {
+    const candidates = await this.em.find(ApiKey, { revokedAt: null }, { populate: ['site'] });
+
+    for (const candidate of candidates) {
+      const matches = await argon2.verify(candidate.keyHash, rawKey);
+      if (matches) {
+        candidate.lastUsedAt = new Date();
+        await this.em.flush();
+        return candidate;
+      }
+    }
+
+    return null;
+  }
 }
