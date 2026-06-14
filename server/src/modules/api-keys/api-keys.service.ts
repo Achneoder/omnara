@@ -11,10 +11,10 @@ import { ApiKeyResponseDto } from './dto/api-key-response.dto.js';
 export class ApiKeysService {
   constructor(private readonly em: EntityManager) {}
 
-  async generate(dto: CreateApiKeyDto): Promise<ApiKeyResponseDto> {
-    const site = await this.em.findOne(Site, { id: dto.siteId });
+  async generate(siteId: string, dto: CreateApiKeyDto): Promise<ApiKeyResponseDto> {
+    const site = await this.em.findOne(Site, { id: siteId });
     if (!site) {
-      throw new NotFoundException(`Site ${dto.siteId} not found`);
+      throw new NotFoundException(`Site ${siteId} not found`);
     }
 
     const rawKey = `omk_${randomBytes(32).toString('hex')}`;

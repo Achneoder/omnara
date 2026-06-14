@@ -29,7 +29,7 @@ export class ApiKeysController {
     @Param('siteId') siteId: string,
     @Body() dto: CreateApiKeyDto,
   ): Promise<ApiKeyResponseDto> {
-    return this.apiKeysService.generate({ ...dto, siteId });
+    return this.apiKeysService.generate(siteId, dto);
   }
 
   @Delete(':keyId')
