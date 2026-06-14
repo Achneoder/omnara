@@ -34,6 +34,3 @@ coverage/
 
 # pnpm
 .pnpm-store/
-
-# Claude
-.claude/agent-memory/
