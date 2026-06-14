@@ -95,9 +95,17 @@ The **Dashboard** is for humans. It shows AI activity in real time, surfaces con
 - **Rate limiting** — global throttling (100 req/60s) with stricter limits on auth endpoints
 - **Security headers** — Helmet, CORS restrictions, request body size limits
 
+### Site Serving (SSR)
+
+- Server-side rendered HTML pages for every managed site
+- Full theme integration — design tokens, raw CSS, and component-scoped styles injected into every page
+- Component template rendering with `{{placeholder}}` syntax and semantic field fallback
+- Public routes at `/s/:siteId/...` — home pages, content type listings, and entry detail pages
+- No authentication required — built for end-user traffic
+
 ### Headless Public API
 
-- Unauthenticated endpoints for consuming published content and themes
+- Unauthenticated JSON endpoints for consuming published content and themes
 - ETag-based caching for theme delivery
 - List published entries filtered by content type
 - Built to power any frontend — websites, mobile apps, static site generators
