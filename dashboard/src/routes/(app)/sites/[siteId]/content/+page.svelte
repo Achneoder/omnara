@@ -52,7 +52,7 @@
     editingEntry = entry;
     editTitle = entry.title;
     editSlug = entry.slug;
-    editBody = entry.body;
+    editBody = entry.body != null ? JSON.stringify(entry.body, null, 2) : '';
     editStatus = entry.status;
     saveError = '';
   }
@@ -63,10 +63,20 @@
     saving = true;
     saveError = '';
     try {
+      let parsedBody: Record<string, unknown> | undefined;
+      if (editBody.trim()) {
+        try {
+          parsedBody = JSON.parse(editBody);
+        } catch {
+          saveError = 'Body must be valid JSON.';
+          saving = false;
+          return;
+        }
+      }
       const updated = await api.entries.update(siteId, editingEntry.id, {
         title: editTitle,
         slug: editSlug,
-        body: editBody,
+        body: parsedBody,
         status: editStatus,
       });
       entries = entries.map((e) => (e.id === updated.id ? updated : e));

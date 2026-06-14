@@ -110,7 +110,7 @@ export interface UpdateContentTypeDto {
 export interface CreateEntryDto {
   title: string;
   slug: string;
-  body: string;
+  body?: Record<string, unknown>;
   status?: ContentStatus;
   contentTypeId?: string;
 }
@@ -118,7 +118,7 @@ export interface CreateEntryDto {
 export interface UpdateEntryDto {
   title?: string;
   slug?: string;
-  body?: string;
+  body?: Record<string, unknown>;
   status?: ContentStatus;
 }
 
