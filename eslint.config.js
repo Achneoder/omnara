@@ -25,6 +25,12 @@ export default tseslint.config(
     },
   },
   {
+    files: ['**/*.svelte.ts'],
+    languageOptions: {
+      parser: tseslint.parser,
+    },
+  },
+  {
     files: ['server/**/*.ts'],
     languageOptions: {
       globals: {
@@ -38,6 +44,8 @@ export default tseslint.config(
         'error',
         { argsIgnorePattern: '^_', caughtErrorsIgnorePattern: '^_' },
       ],
+      'svelte/no-navigation-without-resolve': 'off',
+      'svelte/require-each-key': 'warn',
     },
   },
   {
