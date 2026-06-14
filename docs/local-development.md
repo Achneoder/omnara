@@ -6,12 +6,12 @@ This guide covers everything you need to run the full omnara stack on your local
 
 ## Prerequisites
 
-| Tool | Version | Install |
-|---|---|---|
-| Docker Desktop (or Docker Engine + Compose plugin) | Latest | [docs.docker.com/get-docker](https://docs.docker.com/get-docker/) |
-| Docker Compose | v2 (CLI plugin, `docker compose`) | Bundled with Docker Desktop |
-| Node.js | >= 20 | [nodejs.org](https://nodejs.org/) or [fnm](https://github.com/Schniz/fnm) |
-| pnpm | 11.6.0 | `npm install -g pnpm@11.6.0` |
+| Tool                                               | Version                           | Install                                                                   |
+| -------------------------------------------------- | --------------------------------- | ------------------------------------------------------------------------- |
+| Docker Desktop (or Docker Engine + Compose plugin) | Latest                            | [docs.docker.com/get-docker](https://docs.docker.com/get-docker/)         |
+| Docker Compose                                     | v2 (CLI plugin, `docker compose`) | Bundled with Docker Desktop                                               |
+| Node.js                                            | >= 20                             | [nodejs.org](https://nodejs.org/) or [fnm](https://github.com/Schniz/fnm) |
+| pnpm                                               | 11.6.0                            | `npm install -g pnpm@11.6.0`                                              |
 
 > **Note:** Docker Compose v2 ships as a CLI plugin (`docker compose`), not the legacy standalone `docker-compose` binary. The setup script checks for the plugin form.
 
@@ -64,11 +64,12 @@ pnpm --filter @omnara/client dev
 pnpm --filter @omnara/dashboard dev
 ```
 
-| Service | URL |
-|---|---|
-| API (NestJS) | http://localhost:3000 |
-| Client (SvelteKit) | http://localhost:5173 |
-| Dashboard (SvelteKit) | http://localhost:5174 |
+| Service               | URL                             |
+| --------------------- | ------------------------------- |
+| API (NestJS)          | http://localhost:3000           |
+| Client (SvelteKit)    | http://localhost:5173           |
+| Dashboard (SvelteKit) | http://localhost:5174           |
+| Served Sites          | http://localhost:3000/s/:siteId |
 
 ---
 
@@ -76,33 +77,33 @@ pnpm --filter @omnara/dashboard dev
 
 ### Root `.env` (docker compose variable substitution)
 
-| Variable | Default | Description |
-|---|---|---|
-| `DB_HOST` | `localhost` | PostgreSQL host |
-| `DB_PORT` | `5432` | PostgreSQL port (also the host-mapped port) |
-| `DB_USER` | `omnara` | PostgreSQL user |
-| `DB_PASSWORD` | `omnara` | PostgreSQL password |
-| `DB_NAME` | `omnara` | PostgreSQL database name |
+| Variable      | Default     | Description                                 |
+| ------------- | ----------- | ------------------------------------------- |
+| `DB_HOST`     | `localhost` | PostgreSQL host                             |
+| `DB_PORT`     | `5432`      | PostgreSQL port (also the host-mapped port) |
+| `DB_USER`     | `omnara`    | PostgreSQL user                             |
+| `DB_PASSWORD` | `omnara`    | PostgreSQL password                         |
+| `DB_NAME`     | `omnara`    | PostgreSQL database name                    |
 
 ### `server/.env`
 
-| Variable | Default | Description |
-|---|---|---|
-| `PORT` | `3000` | HTTP port the NestJS server listens on |
-| `NODE_ENV` | `development` | Node environment |
-| `CLIENT_URL` | `http://localhost:5173` | Allowed CORS origin for the client |
-| `DASHBOARD_URL` | `http://localhost:5174` | Allowed CORS origin for the dashboard |
-| `DATABASE_URL` | `postgresql://omnara:omnara@localhost:5432/omnara` | Full PostgreSQL connection string (used by MikroORM) |
-| `DB_HOST` | `localhost` | PostgreSQL host |
-| `DB_PORT` | `5432` | PostgreSQL port |
-| `DB_USER` | `omnara` | PostgreSQL user |
-| `DB_PASSWORD` | `omnara` | PostgreSQL password |
-| `DB_NAME` | `omnara` | PostgreSQL database name |
+| Variable        | Default                                            | Description                                          |
+| --------------- | -------------------------------------------------- | ---------------------------------------------------- |
+| `PORT`          | `3000`                                             | HTTP port the NestJS server listens on               |
+| `NODE_ENV`      | `development`                                      | Node environment                                     |
+| `CLIENT_URL`    | `http://localhost:5173`                            | Allowed CORS origin for the client                   |
+| `DASHBOARD_URL` | `http://localhost:5174`                            | Allowed CORS origin for the dashboard                |
+| `DATABASE_URL`  | `postgresql://omnara:omnara@localhost:5432/omnara` | Full PostgreSQL connection string (used by MikroORM) |
+| `DB_HOST`       | `localhost`                                        | PostgreSQL host                                      |
+| `DB_PORT`       | `5432`                                             | PostgreSQL port                                      |
+| `DB_USER`       | `omnara`                                           | PostgreSQL user                                      |
+| `DB_PASSWORD`   | `omnara`                                           | PostgreSQL password                                  |
+| `DB_NAME`       | `omnara`                                           | PostgreSQL database name                             |
 
 ### `client/.env` and `dashboard/.env`
 
-| Variable | Default | Description |
-|---|---|---|
+| Variable       | Default                 | Description                |
+| -------------- | ----------------------- | -------------------------- |
 | `VITE_API_URL` | `http://localhost:3000` | Base URL of the NestJS API |
 
 > Vite only exposes variables prefixed with `VITE_` to the browser bundle.

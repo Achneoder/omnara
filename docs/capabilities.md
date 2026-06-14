@@ -106,7 +106,46 @@ The dashboard is the human control surface. It does not replace the AI — it le
 
 ---
 
-### 4. MCP Client (Headless Content Consumer)
+### 4. Site Serving (Server-Side Rendering)
+
+The NestJS server renders published content as complete HTML pages, making managed sites browsable directly from the server without any external frontend. Pages include full theme integration and are served unauthenticated.
+
+**Scope:**
+
+- Server-side rendered HTML pages for every managed site
+- Full theme integration: design tokens, raw CSS, and component-scoped styles injected into every page
+- Component template rendering using `{{placeholder}}` syntax with HTML escaping
+- Semantic field fallback when no theme component is assigned to a content type
+- Multi-site support: each site served under its own route prefix
+
+**Status:** ✅ **Implemented.** Four public routes serving complete HTML documents.
+
+**Details:**
+
+| Route                                        | Purpose                                                              |
+| -------------------------------------------- | -------------------------------------------------------------------- |
+| `GET /s/:siteId`                             | Site home page — lists all content types with published entry counts |
+| `GET /s/:siteId/content-types`               | Content type listing with entry counts                               |
+| `GET /s/:siteId/:contentTypeSlug`            | Published entries for a content type, ordered by publish date        |
+| `GET /s/:siteId/:contentTypeSlug/:entrySlug` | Single entry rendered with component template or semantic fields     |
+
+**Rendering pipeline:**
+
+1. Validate site existence and fetch theme (tokens, raw CSS, components)
+2. Query published content entries filtered by content type and status
+3. If a theme component is assigned to the content type: substitute `{{placeholder}}` tokens with escaped body values via props schema
+4. If no component is assigned: render fields semantically (richtext, URLs, text, arrays, nested objects)
+5. Assemble a complete HTML5 document with theme CSS custom properties, raw CSS, and component-scoped styles
+
+**Security:**
+
+- All user-content values are HTML-escaped before injection (XSS prevention)
+- Theme CSS is sanitized by the existing `ThemesService.sanitizeRawCss()` pipeline
+- No authentication required — built for end-user traffic
+
+---
+
+### 5. MCP Client (Headless Content Consumer)
 
 The MCP Client is a Svelte 5 frontend that consumes published content from the public API. It demonstrates how any frontend can render omnara-managed content using theme-driven templates.
 
@@ -136,7 +175,7 @@ The MCP Client is a Svelte 5 frontend that consumes published content from the p
 
 ---
 
-### 5. MCP Protocol Layer
+### 6. MCP Protocol Layer
 
 The MCP Server exposes a standards-compliant MCP endpoint that any MCP-compatible agent — including Claude.ai Pro, Max, and Teams — can connect to directly.
 
@@ -194,7 +233,7 @@ The MCP Server exposes a standards-compliant MCP endpoint that any MCP-compatibl
 
 ---
 
-### 6. REST API (Dashboard + External Consumers)
+### 7. REST API (Dashboard + External Consumers)
 
 The same NestJS server exposes a REST API used by the dashboard and available to any external frontend or integration.
 
@@ -214,7 +253,7 @@ The same NestJS server exposes a REST API used by the dashboard and available to
 
 ---
 
-### 7. Authentication and Access Control
+### 8. Authentication and Access Control
 
 **Status:** ✅ **Implemented.** Dual auth system with security hardening.
 
@@ -231,7 +270,7 @@ The same NestJS server exposes a REST API used by the dashboard and available to
 
 ---
 
-### 8. Theme and Design System
+### 9. Theme and Design System
 
 **Status:** ✅ **Implemented.** Full theme management with component-based rendering.
 
@@ -252,7 +291,7 @@ The same NestJS server exposes a REST API used by the dashboard and available to
 
 ---
 
-### 9. Content Modeling
+### 10. Content Modeling
 
 **Status:** ✅ **Implemented.** Flexible content types with JSON field schemas.
 
@@ -266,7 +305,7 @@ The same NestJS server exposes a REST API used by the dashboard and available to
 
 ---
 
-### 10. Activity Logging
+### 11. Activity Logging
 
 **Status:** ✅ **Implemented.** Fire-and-forget audit trail for all content operations.
 
@@ -279,7 +318,7 @@ The same NestJS server exposes a REST API used by the dashboard and available to
 
 ---
 
-### 11. Database Layer
+### 12. Database Layer
 
 **Status:** ✅ **Implemented.** PostgreSQL via MikroORM with auto-migration on startup.
 
@@ -327,6 +366,7 @@ The same NestJS server exposes a REST API used by the dashboard and available to
 | Theme-driven template rendering               | ✅ Complete |
 | Design system (tokens, components, Storybook) | ✅ Complete |
 | Public API (unauthenticated content delivery) | ✅ Complete |
+| Site Serving (server-side rendered pages)     | ✅ Complete |
 | Docker Compose + setup script                 | ✅ Complete |
 
 ---
