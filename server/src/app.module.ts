@@ -10,6 +10,10 @@ import { UsersModule } from './modules/users/users.module.js';
 import { AuthModule } from './modules/auth/auth.module.js';
 import { SitesModule } from './modules/sites/sites.module.js';
 import { ApiKeysModule } from './modules/api-keys/api-keys.module.js';
+import { ActivityLogModule } from './modules/activity-log/activity-log.module.js';
+import { ContentTypesModule } from './modules/content-types/content-types.module.js';
+import { ContentEntriesModule } from './modules/content-entries/content-entries.module.js';
+import { MediaReferencesModule } from './modules/media-references/media-references.module.js';
 
 @Module({
   imports: [
@@ -21,6 +25,10 @@ import { ApiKeysModule } from './modules/api-keys/api-keys.module.js';
     McpModule,
     SitesModule,
     ApiKeysModule,
+    ActivityLogModule,
+    ContentTypesModule,
+    ContentEntriesModule,
+    MediaReferencesModule,
   ],
   controllers: [AppController],
   providers: [
