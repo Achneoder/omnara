@@ -21,13 +21,10 @@ export class SiteServeController {
     return this.siteServeService.renderEntryDetailPage(siteId, contentTypeSlug, entrySlug);
   }
 
-  @Get(':siteId/:contentTypeSlug')
+  @Get(':siteId/:slug')
   @Header('Content-Type', 'text/html; charset=utf-8')
-  async entryList(
-    @Param('siteId') siteId: string,
-    @Param('contentTypeSlug') contentTypeSlug: string,
-  ): Promise<string> {
-    return this.siteServeService.renderEntryListPage(siteId, contentTypeSlug);
+  async slugHandler(@Param('siteId') siteId: string, @Param('slug') slug: string): Promise<string> {
+    return this.siteServeService.renderBySlug(siteId, slug);
   }
 
   @Get(':siteId')

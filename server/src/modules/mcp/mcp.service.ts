@@ -7,8 +7,10 @@ import { ContentTypesService } from '../content-types/content-types.service.js';
 import { ContentEntriesService } from '../content-entries/content-entries.service.js';
 import { MediaReferencesService } from '../media-references/media-references.service.js';
 import { ThemesService } from '../themes/themes.service.js';
+import { PagesService } from '../pages/pages.service.js';
 import { ComponentCategory } from '../themes/entities/theme-component.entity.js';
 import { ContentStatus } from '../content-entries/entities/content-entry.entity.js';
+import { PageStatus } from '../pages/entities/page.entity.js';
 import type { Site } from '../sites/entities/site.entity.js';
 
 interface McpSession {
@@ -41,6 +43,7 @@ export class McpService implements OnApplicationShutdown {
     private readonly contentEntriesService: ContentEntriesService,
     private readonly mediaReferencesService: MediaReferencesService,
     private readonly themesService: ThemesService,
+    private readonly pagesService: PagesService,
   ) {}
 
   /**
@@ -642,6 +645,322 @@ export class McpService implements OnApplicationShutdown {
             component_slug,
           );
           return ok({ assigned: true });
+        } catch (e) {
+          return err(e);
+        }
+      },
+    );
+
+    // -------------------------------------------------------------------------
+    // Page tools
+    // -------------------------------------------------------------------------
+
+    server.registerTool(
+      'create_page',
+      {
+        description:
+          'Creates a new structural page for a site. Pages are navigable website pages (e.g. "About", "Contact") that compose multiple theme components via sections. Returns the created page with its UUID.',
+        inputSchema: {
+          site_id: z.string().describe('UUID of the site to create the page in'),
+          title: z.string().describe('Human-readable page title'),
+          slug: z.string().describe('URL-safe identifier for the page (e.g. "about-us")'),
+          is_homepage: z.boolean().optional().describe('Set as the site homepage (default false)'),
+          meta: z
+            .object({
+              title: z.string().optional().describe('SEO title override'),
+              description: z.string().optional().describe('SEO meta description'),
+            })
+            .optional()
+            .describe('SEO metadata'),
+          status: z
+            .enum([PageStatus.DRAFT, PageStatus.PUBLISHED])
+            .optional()
+            .describe('Page status — defaults to draft'),
+        },
+      },
+      async ({ site_id, title, slug, is_homepage, meta, status }) => {
+        try {
+          const page = await this.pagesService.create(site_id, {
+            title,
+            slug,
+            isHomepage: is_homepage,
+            meta: meta as Record<string, unknown> | undefined,
+            status: status as PageStatus | undefined,
+          });
+          return ok(page);
+        } catch (e) {
+          return err(e);
+        }
+      },
+    );
+
+    server.registerTool(
+      'update_page',
+      {
+        description:
+          'Updates an existing page. All fields except site_id and page_id are optional. Returns the updated page.',
+        inputSchema: {
+          site_id: z.string().describe('UUID of the site'),
+          page_id: z.string().describe('UUID of the page to update'),
+          title: z.string().optional().describe('New page title'),
+          slug: z.string().optional().describe('New URL-safe slug'),
+          is_homepage: z.boolean().optional().describe('Set as homepage'),
+          meta: z
+            .object({
+              title: z.string().optional(),
+              description: z.string().optional(),
+            })
+            .optional()
+            .describe('SEO metadata'),
+          status: z
+            .enum([PageStatus.DRAFT, PageStatus.PUBLISHED])
+            .optional()
+            .describe('Page status'),
+        },
+      },
+      async ({ site_id, page_id, title, slug, is_homepage, meta, status }) => {
+        try {
+          const page = await this.pagesService.update(site_id, page_id, {
+            title,
+            slug,
+            isHomepage: is_homepage,
+            meta: meta as Record<string, unknown> | undefined,
+            status: status as PageStatus | undefined,
+          });
+          return ok(page);
+        } catch (e) {
+          return err(e);
+        }
+      },
+    );
+
+    server.registerTool(
+      'delete_page',
+      {
+        description: 'Permanently deletes a page and all its sections. Returns a confirmation.',
+        inputSchema: {
+          site_id: z.string().describe('UUID of the site'),
+          page_id: z.string().describe('UUID of the page to delete'),
+        },
+      },
+      async ({ site_id, page_id }) => {
+        try {
+          await this.pagesService.remove(site_id, page_id);
+          return ok({ deleted: true });
+        } catch (e) {
+          return err(e);
+        }
+      },
+    );
+
+    server.registerTool(
+      'list_pages',
+      {
+        description:
+          'Lists all pages for a site, optionally filtered by status. Returns basic page info without sections. Use get_page to retrieve sections for a specific page.',
+        inputSchema: {
+          site_id: z.string().describe('UUID of the site'),
+          status: z
+            .enum([PageStatus.DRAFT, PageStatus.PUBLISHED])
+            .optional()
+            .describe('Filter by status — omit for all pages'),
+        },
+      },
+      async ({ site_id, status }) => {
+        try {
+          const pages = await this.pagesService.findAll(site_id, status as PageStatus | undefined);
+          return ok(
+            pages.map((p) => ({
+              id: p.id,
+              title: p.title,
+              slug: p.slug,
+              isHomepage: p.isHomepage,
+              status: p.status,
+              sortOrder: p.sortOrder,
+            })),
+          );
+        } catch (e) {
+          return err(e);
+        }
+      },
+    );
+
+    server.registerTool(
+      'get_page',
+      {
+        description:
+          'Returns a single page with all its sections and their assigned theme components. Use this to inspect a page structure before editing sections.',
+        inputSchema: {
+          site_id: z.string().describe('UUID of the site'),
+          page_id: z.string().describe('UUID of the page to retrieve'),
+        },
+      },
+      async ({ site_id, page_id }) => {
+        try {
+          const page = await this.pagesService.findOne(site_id, page_id);
+          return ok({
+            id: page.id,
+            title: page.title,
+            slug: page.slug,
+            isHomepage: page.isHomepage,
+            meta: page.meta,
+            status: page.status,
+            sortOrder: page.sortOrder,
+            sections: page.sections.getItems().map((s) => ({
+              id: s.id,
+              componentSlug: s.component.slug,
+              componentName: s.component.name,
+              sortOrder: s.sortOrder,
+              props: s.props,
+            })),
+          });
+        } catch (e) {
+          return err(e);
+        }
+      },
+    );
+
+    server.registerTool(
+      'add_page_section',
+      {
+        description:
+          'Adds a section to a page. Each section references a theme component by slug and provides inline props data for the component template placeholders. Sections are rendered in sort_order. If sort_order is omitted, the section is appended to the end.',
+        inputSchema: {
+          site_id: z.string().describe('UUID of the site'),
+          page_id: z.string().describe('UUID of the page'),
+          component_slug: z
+            .string()
+            .describe('Slug of the theme component to use for this section'),
+          sort_order: z
+            .number()
+            .optional()
+            .describe('Display order position (0-based). Omit to append.'),
+          props: z
+            .record(z.unknown())
+            .optional()
+            .describe(
+              'Inline data object for the component template placeholders. Keys should match the component propsSchema.',
+            ),
+        },
+      },
+      async ({ site_id, page_id, component_slug, sort_order, props }) => {
+        try {
+          const section = await this.pagesService.addSection(site_id, page_id, {
+            componentSlug: component_slug,
+            sortOrder: sort_order,
+            props,
+          });
+          return ok(section);
+        } catch (e) {
+          return err(e);
+        }
+      },
+    );
+
+    server.registerTool(
+      'update_page_section',
+      {
+        description:
+          'Updates a page section — change its sort_order, its props data, or both. All fields except site_id and section_id are optional.',
+        inputSchema: {
+          site_id: z.string().describe('UUID of the site'),
+          section_id: z.string().describe('UUID of the section to update'),
+          sort_order: z.number().optional().describe('New display order position'),
+          props: z
+            .record(z.unknown())
+            .optional()
+            .describe('New inline data for the component template placeholders'),
+        },
+      },
+      async ({ site_id, section_id, sort_order, props }) => {
+        try {
+          const section = await this.pagesService.updateSection(site_id, section_id, {
+            sortOrder: sort_order,
+            props,
+          });
+          return ok(section);
+        } catch (e) {
+          return err(e);
+        }
+      },
+    );
+
+    server.registerTool(
+      'remove_page_section',
+      {
+        description: 'Removes a section from a page. Returns a confirmation.',
+        inputSchema: {
+          site_id: z.string().describe('UUID of the site'),
+          section_id: z.string().describe('UUID of the section to remove'),
+        },
+      },
+      async ({ site_id, section_id }) => {
+        try {
+          await this.pagesService.removeSection(site_id, section_id);
+          return ok({ deleted: true });
+        } catch (e) {
+          return err(e);
+        }
+      },
+    );
+
+    server.registerTool(
+      'reorder_page_sections',
+      {
+        description:
+          'Reorders the sections of a page. Pass the section UUIDs in the desired display order. The first UUID gets sort_order 0, the second gets 1, etc.',
+        inputSchema: {
+          site_id: z.string().describe('UUID of the site'),
+          page_id: z.string().describe('UUID of the page'),
+          section_ids: z
+            .array(z.string())
+            .describe('Array of section UUIDs in the desired display order'),
+        },
+      },
+      async ({ site_id, page_id, section_ids }) => {
+        try {
+          const sections = await this.pagesService.reorderSections(site_id, page_id, section_ids);
+          return ok(sections);
+        } catch (e) {
+          return err(e);
+        }
+      },
+    );
+
+    server.registerTool(
+      'publish_page',
+      {
+        description:
+          'Publishes a page by setting its status to "published". Published pages are served at their slug URL and the homepage (if marked).',
+        inputSchema: {
+          site_id: z.string().describe('UUID of the site'),
+          page_id: z.string().describe('UUID of the page to publish'),
+        },
+      },
+      async ({ site_id, page_id }) => {
+        try {
+          const page = await this.pagesService.publish(site_id, page_id);
+          return ok(page);
+        } catch (e) {
+          return err(e);
+        }
+      },
+    );
+
+    server.registerTool(
+      'unpublish_page',
+      {
+        description:
+          'Unpublishes a page by setting its status to "draft". The page will no longer be served at its URL.',
+        inputSchema: {
+          site_id: z.string().describe('UUID of the site'),
+          page_id: z.string().describe('UUID of the page to unpublish'),
+        },
+      },
+      async ({ site_id, page_id }) => {
+        try {
+          const page = await this.pagesService.unpublish(site_id, page_id);
+          return ok(page);
         } catch (e) {
           return err(e);
         }
