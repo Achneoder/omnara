@@ -4,7 +4,7 @@ import { ConfigModule } from '@nestjs/config';
 import { Module } from '@nestjs/common';
 import { MikroOrmModule } from '@mikro-orm/nestjs';
 import { Migrator } from '@mikro-orm/migrations';
-import { TsMorphMetadataProvider } from '@mikro-orm/reflection';
+import { ReflectMetadataProvider } from '@mikro-orm/decorators/legacy';
 import { PostgreSqlDriver, EntityManager } from '@mikro-orm/postgresql';
 import { User } from '../modules/users/entities/user.entity.js';
 import { RefreshToken } from '../modules/users/entities/refresh-token.entity.js';
@@ -21,7 +21,7 @@ import { InitialUserSeeder } from './initial-user.seeder.js';
       password: process.env['DB_PASSWORD'] ?? 'omnara',
       dbName: process.env['DB_NAME'] ?? 'omnara',
       entities: [User, RefreshToken],
-      metadataProvider: TsMorphMetadataProvider,
+      metadataProvider: ReflectMetadataProvider,
       extensions: [Migrator],
     }),
   ],
