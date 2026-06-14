@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { NotFoundException } from '@nestjs/common';
 import { EntityManager } from '@mikro-orm/postgresql';
+import * as argon2 from 'argon2';
 import { ApiKeysService } from './api-keys.service.js';
 import { ApiKey } from './entities/api-key.entity.js';
 import { Site } from '../sites/entities/site.entity.js';
@@ -8,6 +9,7 @@ import { CreateApiKeyDto } from './dto/create-api-key.dto.js';
 
 jest.mock('argon2', () => ({
   hash: jest.fn().mockResolvedValue('hashed-key'),
+  verify: jest.fn(),
 }));
 
 const mockEntityManager = {
@@ -110,6 +112,69 @@ describe('ApiKeysService', () => {
       mockEntityManager.findOne.mockResolvedValueOnce(null);
 
       await expect(service.revoke('missing-key')).rejects.toThrow(NotFoundException);
+    });
+  });
+
+  describe('validateKey', () => {
+    const mockSite = { id: 'site-1', name: 'Test Site' } as Site;
+
+    const buildCandidate = (hash: string): ApiKey =>
+      ({
+        id: 'key-1',
+        keyHash: hash,
+        label: 'Test Key',
+        site: mockSite,
+        lastUsedAt: null,
+        revokedAt: null,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      }) as ApiKey;
+
+    it('returns ApiKey with site when raw key matches', async () => {
+      const candidate = buildCandidate('$argon2id$...');
+      mockEntityManager.find.mockResolvedValueOnce([candidate]);
+      (argon2.verify as jest.Mock).mockResolvedValueOnce(true);
+      mockEntityManager.flush.mockResolvedValueOnce(undefined);
+
+      const result = await service.validateKey('omk_validraw');
+
+      expect(mockEntityManager.find).toHaveBeenCalledWith(
+        ApiKey,
+        { revokedAt: null },
+        { populate: ['site'] },
+      );
+      expect(argon2.verify).toHaveBeenCalledWith('$argon2id$...', 'omk_validraw');
+      expect(result).toBe(candidate);
+      expect(result?.lastUsedAt).toBeInstanceOf(Date);
+    });
+
+    it('returns null when no key matches', async () => {
+      const candidate = buildCandidate('$argon2id$...');
+      mockEntityManager.find.mockResolvedValueOnce([candidate]);
+      (argon2.verify as jest.Mock).mockResolvedValueOnce(false);
+
+      const result = await service.validateKey('omk_wrongraw');
+
+      expect(result).toBeNull();
+    });
+
+    it('returns null when there are no non-revoked keys', async () => {
+      mockEntityManager.find.mockResolvedValueOnce([]);
+
+      const result = await service.validateKey('omk_anything');
+
+      expect(result).toBeNull();
+      expect(argon2.verify).not.toHaveBeenCalled();
+    });
+
+    it('returns null and does not match a key whose revokedAt is set (ORM filters it)', async () => {
+      // The ORM filter { revokedAt: null } excludes revoked keys at the DB level.
+      // Simulate by returning an empty array from the mock.
+      mockEntityManager.find.mockResolvedValueOnce([]);
+
+      const result = await service.validateKey('omk_revokedraw');
+
+      expect(result).toBeNull();
     });
   });
 });
