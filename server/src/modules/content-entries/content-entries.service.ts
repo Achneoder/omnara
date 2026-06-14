@@ -119,7 +119,8 @@ export class ContentEntriesService {
 
   async remove(id: string, siteId: string): Promise<void> {
     const entry = await this.findOne(id, siteId);
-    await this.em.removeAndFlush(entry);
+    this.em.remove(entry);
+    await this.em.flush();
 
     this.logActivity({
       action: 'content_entry.deleted',

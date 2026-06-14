@@ -103,7 +103,8 @@ export class ContentTypesService {
 
   async remove(id: string, siteId: string): Promise<void> {
     const contentType = await this.findOne(id, siteId);
-    await this.em.removeAndFlush(contentType);
+    this.em.remove(contentType);
+    await this.em.flush();
 
     this.logActivity({
       action: 'content_type.deleted',

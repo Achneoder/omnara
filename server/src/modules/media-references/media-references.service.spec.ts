@@ -12,7 +12,7 @@ const mockEntityManager = {
   findOne: jest.fn(),
   persist: jest.fn(),
   flush: jest.fn(),
-  removeAndFlush: jest.fn(),
+  remove: jest.fn(),
 };
 
 const mockActivityLogService = {
@@ -115,11 +115,12 @@ describe('MediaReferencesService', () => {
       const media = { id: 'm-1', contentEntry: { id: 'e-1' } } as MediaReference;
       const entry = { id: 'e-1' } as ContentEntry;
       mockEntityManager.findOne.mockResolvedValueOnce(media).mockResolvedValueOnce(entry);
-      mockEntityManager.removeAndFlush.mockResolvedValueOnce(undefined);
+      mockEntityManager.flush.mockResolvedValueOnce(undefined);
 
       await service.detach('m-1', 'e-1', 'site-1');
 
-      expect(mockEntityManager.removeAndFlush).toHaveBeenCalledWith(media);
+      expect(mockEntityManager.remove).toHaveBeenCalledWith(media);
+      expect(mockEntityManager.flush).toHaveBeenCalled();
     });
 
     it('throws NotFoundException when media reference does not exist', async () => {

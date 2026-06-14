@@ -15,7 +15,7 @@ const mockEntityManager = {
   findOne: jest.fn(),
   persist: jest.fn(),
   flush: jest.fn(),
-  removeAndFlush: jest.fn(),
+  remove: jest.fn(),
 };
 
 const mockActivityLogService = {
@@ -212,11 +212,12 @@ describe('ContentEntriesService', () => {
     it('removes the entry', async () => {
       const entry = { id: 'e-1' } as ContentEntry;
       mockEntityManager.findOne.mockResolvedValueOnce(entry);
-      mockEntityManager.removeAndFlush.mockResolvedValueOnce(undefined);
+      mockEntityManager.flush.mockResolvedValueOnce(undefined);
 
       await service.remove('e-1', 'site-1');
 
-      expect(mockEntityManager.removeAndFlush).toHaveBeenCalledWith(entry);
+      expect(mockEntityManager.remove).toHaveBeenCalledWith(entry);
+      expect(mockEntityManager.flush).toHaveBeenCalled();
     });
 
     it('throws NotFoundException when entry does not exist', async () => {

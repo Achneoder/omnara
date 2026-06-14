@@ -1,4 +1,5 @@
 import { EntityManager } from '@mikro-orm/postgresql';
+import type { RequiredEntityData } from '@mikro-orm/core';
 import * as argon2 from 'argon2';
 import { User, UserRole } from '../modules/users/entities/user.entity.js';
 
@@ -27,7 +28,7 @@ export class InitialUserSeeder {
       email: normalizedEmail,
       passwordHash,
       role: UserRole.ADMIN,
-    });
+    } as RequiredEntityData<User>);
 
     await this.em.flush();
 

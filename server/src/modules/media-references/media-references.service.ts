@@ -70,7 +70,8 @@ export class MediaReferencesService {
       throw new NotFoundException(`ContentEntry ${entryId} not found`);
     }
 
-    await this.em.removeAndFlush(media);
+    this.em.remove(media);
+    await this.em.flush();
 
     this.logActivity({
       action: 'media.detached',

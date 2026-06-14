@@ -1,4 +1,4 @@
-import { Entity, PrimaryKey, Property, ManyToOne, Index } from '@mikro-orm/core';
+import { Entity, PrimaryKey, Property, ManyToOne, Index } from '@mikro-orm/decorators/legacy';
 import { v4 as uuidv4 } from 'uuid';
 import { Site } from '../../sites/entities/site.entity.js';
 
@@ -8,11 +8,11 @@ export class ActivityLog {
   id: string = uuidv4();
 
   // Nullable: activity may not be tied to a specific site (e.g. auth events)
-  @ManyToOne(() => Site, { fieldName: 'site_id', nullable: true, onDelete: 'set null' })
+  @ManyToOne(() => Site, { fieldName: 'site_id', nullable: true, deleteRule: 'set null' })
   @Index()
   site: Site | null = null;
 
-  @Property({ nullable: true })
+  @Property({ type: 'text', nullable: true })
   @Index()
   sessionId: string | null = null;
 
@@ -23,7 +23,7 @@ export class ActivityLog {
   entityType!: string;
 
   // UUID of the affected entity, stored as string to accommodate cross-table references
-  @Property({ nullable: true })
+  @Property({ type: 'text', nullable: true })
   entityId: string | null = null;
 
   @Property({ type: 'jsonb', nullable: true, default: '{}' })
