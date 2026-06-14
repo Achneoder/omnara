@@ -6,5 +6,5 @@ export class ApiKeyResponseDto {
   revokedAt!: Date | null;
   createdAt!: Date;
   // Only present on initial creation — never available again after that
-  plainTextKey?: string;
+  key?: string;
 }

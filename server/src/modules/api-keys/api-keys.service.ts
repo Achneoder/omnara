@@ -35,7 +35,7 @@ export class ApiKeysService {
       lastUsedAt: apiKey.lastUsedAt,
       revokedAt: apiKey.revokedAt,
       createdAt: apiKey.createdAt,
-      plainTextKey: rawKey,
+      key: rawKey,
     };
   }
 
