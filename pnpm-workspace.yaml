@@ -4,7 +4,9 @@ packages:
   - 'dashboard'
   - 'ui'
 allowBuilds:
+  argon2: true
   esbuild: true
   svelte-preprocess: true
 onlyBuiltDependencies:
   - esbuild
+  - argon2
