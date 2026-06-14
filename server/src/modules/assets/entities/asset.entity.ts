@@ -33,6 +33,9 @@ export class Asset {
   @Property({ columnType: 'varchar(20)', default: AssetCategory.OTHER })
   category: string = AssetCategory.OTHER;
 
+  @Property({ type: 'jsonb', nullable: true, default: '{}' })
+  variants: Record<string, unknown> | null = {};
+
   @Property({ type: 'timestamptz' })
   createdAt: Date = new Date();
 

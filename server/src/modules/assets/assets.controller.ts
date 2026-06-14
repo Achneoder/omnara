@@ -47,28 +47,14 @@ export class AssetsController {
       file.mimetype,
     );
 
-    return {
-      id: asset.id,
-      originalName: asset.originalName,
-      mimeType: asset.mimeType,
-      size: asset.size,
-      category: asset.category,
-      url: `/assets/${asset.site.id ?? siteId}/${asset.id}/${encodeURIComponent(asset.originalName)}`,
-    };
+    return this.toAssetResponse(asset, siteId);
   }
 
   @Get('sites/:siteId/assets')
   @UseGuards(JwtAuthGuard)
   async list(@Param('siteId') siteId: string, @Query() query: ListAssetsQuery) {
     const assets = await this.assetsService.findAll(siteId, query.category);
-    return assets.map((a) => ({
-      id: a.id,
-      originalName: a.originalName,
-      mimeType: a.mimeType,
-      size: a.size,
-      category: a.category,
-      url: `/assets/${siteId}/${a.id}/${encodeURIComponent(a.originalName)}`,
-    }));
+    return assets.map((a) => this.toAssetResponse(a, siteId));
   }
 
   @Delete('sites/:siteId/assets/:id')
@@ -89,5 +75,39 @@ export class AssetsController {
     res.setHeader('Content-Type', asset.mimeType);
     res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
     res.sendFile(absolutePath);
+  }
+
+  private toAssetResponse(
+    a: {
+      id: string;
+      originalName: string;
+      mimeType: string;
+      size: number;
+      category: string;
+      variants?: Record<string, unknown> | null;
+    },
+    siteId: string,
+  ) {
+    const baseUrl = `/assets/${siteId}/${a.id}/${encodeURIComponent(a.originalName)}`;
+
+    const variantUrls: Record<string, string> = {};
+    if (a.variants) {
+      for (const [suffix, v] of Object.entries(a.variants)) {
+        if (v && typeof v === 'object' && 'path' in v) {
+          variantUrls[suffix] =
+            `/assets/${siteId}/${a.id}/${encodeURIComponent(`${a.originalName.replace(/\.[^.]+$/, '')}-${suffix}.webp`)}`;
+        }
+      }
+    }
+
+    return {
+      id: a.id,
+      originalName: a.originalName,
+      mimeType: a.mimeType,
+      size: a.size,
+      category: a.category,
+      url: baseUrl,
+      variants: variantUrls,
+    };
   }
 }
