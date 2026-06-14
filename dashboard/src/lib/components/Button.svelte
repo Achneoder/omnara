@@ -5,6 +5,7 @@
     disabled?: boolean;
     loading?: boolean;
     type?: 'button' | 'submit' | 'reset';
+    form?: string;
     onclick?: () => void;
     children: import('svelte').Snippet;
   }
@@ -15,6 +16,7 @@
     disabled = false,
     loading = false,
     type = 'button',
+    form,
     onclick,
     children,
   }: Props = $props();
@@ -39,6 +41,7 @@
 
 <button
   {type}
+  {form}
   class="{base} {variants[variant]} {sizes[size]}"
   disabled={disabled || loading}
   {onclick}
