@@ -8,9 +8,11 @@ import { ContentEntriesService } from '../content-entries/content-entries.servic
 import { MediaReferencesService } from '../media-references/media-references.service.js';
 import { ThemesService } from '../themes/themes.service.js';
 import { PagesService } from '../pages/pages.service.js';
+import { NavigationService } from '../navigation/navigation.service.js';
 import { ComponentCategory } from '../themes/entities/theme-component.entity.js';
 import { ContentStatus } from '../content-entries/entities/content-entry.entity.js';
 import { PageStatus } from '../pages/entities/page.entity.js';
+import { SitePlatform } from '../sites/entities/site.entity.js';
 import type { Site } from '../sites/entities/site.entity.js';
 
 interface McpSession {
@@ -44,6 +46,7 @@ export class McpService implements OnApplicationShutdown {
     private readonly mediaReferencesService: MediaReferencesService,
     private readonly themesService: ThemesService,
     private readonly pagesService: PagesService,
+    private readonly navigationService: NavigationService,
   ) {}
 
   /**
@@ -97,6 +100,91 @@ export class McpService implements OnApplicationShutdown {
     );
 
     server.registerTool(
+      'create_site',
+      {
+        description:
+          'Creates a new CMS site. A site is the top-level container for all content types, entries, pages, and themes. Returns the created site with its UUID.',
+        inputSchema: {
+          name: z.string().describe('Human-readable site name'),
+          url: z.string().describe('Public URL of the site (e.g. https://example.com)'),
+          platform: z
+            .enum([SitePlatform.WORDPRESS, SitePlatform.SHOPIFY, SitePlatform.CUSTOM])
+            .describe('Platform type: wordpress, shopify, or custom'),
+          settings: z
+            .record(z.unknown())
+            .optional()
+            .describe('Arbitrary site settings as a JSON object'),
+        },
+      },
+      async ({ name, url, platform, settings }) => {
+        try {
+          const site = await this.sitesService.create({
+            name,
+            url,
+            platform: platform as SitePlatform,
+            settings: settings as Record<string, unknown> | undefined,
+          });
+          return ok(site);
+        } catch (e) {
+          return err(e);
+        }
+      },
+    );
+
+    server.registerTool(
+      'update_site',
+      {
+        description:
+          'Updates an existing site. All fields except site_id are optional. Returns the updated site.',
+        inputSchema: {
+          site_id: z.string().describe('UUID of the site to update'),
+          name: z.string().optional().describe('New site name'),
+          url: z.string().optional().describe('New public URL'),
+          platform: z
+            .enum([SitePlatform.WORDPRESS, SitePlatform.SHOPIFY, SitePlatform.CUSTOM])
+            .optional()
+            .describe('New platform type'),
+          settings: z
+            .record(z.unknown())
+            .optional()
+            .describe('New settings object (replaces existing)'),
+        },
+      },
+      async ({ site_id, name, url, platform, settings }) => {
+        try {
+          const site = await this.sitesService.update(site_id, {
+            name,
+            url,
+            platform: platform as SitePlatform | undefined,
+            settings: settings as Record<string, unknown> | undefined,
+          });
+          return ok(site);
+        } catch (e) {
+          return err(e);
+        }
+      },
+    );
+
+    server.registerTool(
+      'delete_site',
+      {
+        description:
+          'Permanently deletes a site and all its content, pages, theme, and API keys. This action cannot be undone. Returns a confirmation.',
+        inputSchema: {
+          site_id: z.string().describe('UUID of the site to delete'),
+        },
+      },
+      async ({ site_id }) => {
+        try {
+          await this.sitesService.remove(site_id);
+          return ok({ deleted: true });
+        } catch (e) {
+          return err(e);
+        }
+      },
+    );
+
+    server.registerTool(
       'list_content_types',
       {
         description:
@@ -116,6 +204,91 @@ export class McpService implements OnApplicationShutdown {
               fieldSchema: t.fieldSchema,
             })),
           );
+        } catch (e) {
+          return err(e);
+        }
+      },
+    );
+
+    server.registerTool(
+      'create_content_type',
+      {
+        description:
+          'Creates a new content type for a site. A content type defines the schema for a category of content (e.g. "blog_post", "product"). The slug must contain only lowercase letters, numbers, and hyphens. Returns the created content type with its UUID.',
+        inputSchema: {
+          site_id: z.string().describe('UUID of the site to create the content type in'),
+          name: z.string().describe('Human-readable name (e.g. "Blog Post")'),
+          slug: z
+            .string()
+            .describe(
+              'URL-safe identifier — lowercase letters, numbers, and hyphens only (e.g. "blog-post")',
+            ),
+          field_schema: z
+            .record(z.unknown())
+            .optional()
+            .describe(
+              'JSON object defining the fields for this content type (e.g. { "title": { "type": "string" }, "body": { "type": "richtext" } })',
+            ),
+        },
+      },
+      async ({ site_id, name, slug, field_schema }) => {
+        try {
+          const contentType = await this.contentTypesService.create(site_id, {
+            name,
+            slug,
+            fieldSchema: field_schema as Record<string, unknown> | undefined,
+          });
+          return ok(contentType);
+        } catch (e) {
+          return err(e);
+        }
+      },
+    );
+
+    server.registerTool(
+      'update_content_type',
+      {
+        description:
+          'Updates an existing content type. All fields except site_id and content_type_id are optional. Returns the updated content type.',
+        inputSchema: {
+          site_id: z.string().describe('UUID of the site'),
+          content_type_id: z.string().describe('UUID of the content type to update'),
+          name: z.string().optional().describe('New display name'),
+          slug: z.string().optional().describe('New URL-safe slug'),
+          field_schema: z
+            .record(z.unknown())
+            .optional()
+            .describe('New field schema (replaces existing)'),
+        },
+      },
+      async ({ site_id, content_type_id, name, slug, field_schema }) => {
+        try {
+          const contentType = await this.contentTypesService.update(content_type_id, site_id, {
+            name,
+            slug,
+            fieldSchema: field_schema as Record<string, unknown> | undefined,
+          });
+          return ok(contentType);
+        } catch (e) {
+          return err(e);
+        }
+      },
+    );
+
+    server.registerTool(
+      'delete_content_type',
+      {
+        description:
+          'Permanently deletes a content type. Entries of this type are protected by RESTRICT and must be deleted first. Returns a confirmation.',
+        inputSchema: {
+          site_id: z.string().describe('UUID of the site'),
+          content_type_id: z.string().describe('UUID of the content type to delete'),
+        },
+      },
+      async ({ site_id, content_type_id }) => {
+        try {
+          await this.contentTypesService.remove(content_type_id, site_id);
+          return ok({ deleted: true });
         } catch (e) {
           return err(e);
         }
@@ -961,6 +1134,151 @@ export class McpService implements OnApplicationShutdown {
         try {
           const page = await this.pagesService.unpublish(site_id, page_id);
           return ok(page);
+        } catch (e) {
+          return err(e);
+        }
+      },
+    );
+
+    // -------------------------------------------------------------------------
+    // Navigation / menu tools
+    // -------------------------------------------------------------------------
+
+    server.registerTool(
+      'create_menu_item',
+      {
+        description:
+          'Creates a navigation menu item for a site. Menu items can be nested by setting a parent_id. Use menu_name to group items into menus (e.g. "header", "footer"). Returns the created menu item with its UUID.',
+        inputSchema: {
+          site_id: z.string().describe('UUID of the site'),
+          label: z.string().describe('Display text for the menu link'),
+          url: z.string().describe('URL or path the menu item links to'),
+          parent_id: z
+            .string()
+            .optional()
+            .describe('UUID of the parent menu item for nested menus'),
+          sort_order: z.number().optional().describe('Display order (0-based)'),
+          menu_name: z
+            .string()
+            .optional()
+            .describe('Menu group name — e.g. "header", "footer" (defaults to "header")'),
+        },
+      },
+      async ({ site_id, label, url, parent_id, sort_order, menu_name }) => {
+        try {
+          const item = await this.navigationService.create(site_id, {
+            label,
+            url,
+            parentId: parent_id,
+            sortOrder: sort_order,
+            menuName: menu_name,
+          });
+          return ok(item);
+        } catch (e) {
+          return err(e);
+        }
+      },
+    );
+
+    server.registerTool(
+      'list_menu_items',
+      {
+        description:
+          'Lists all menu items for a site, optionally filtered by menu_name. Items are returned ordered by sort_order. Use this to inspect the current navigation structure.',
+        inputSchema: {
+          site_id: z.string().describe('UUID of the site'),
+          menu_name: z
+            .string()
+            .optional()
+            .describe('Filter by menu group — e.g. "header" for the main nav'),
+        },
+      },
+      async ({ site_id, menu_name }) => {
+        try {
+          const items = await this.navigationService.findAll(site_id, menu_name);
+          return ok(
+            items.map((i) => ({
+              id: i.id,
+              label: i.label,
+              url: i.url,
+              parentId: i.parent?.id ?? null,
+              sortOrder: i.sortOrder,
+              menuName: i.menuName,
+            })),
+          );
+        } catch (e) {
+          return err(e);
+        }
+      },
+    );
+
+    server.registerTool(
+      'update_menu_item',
+      {
+        description:
+          'Updates a menu item — change its label, url, parent, sort order, or menu group. All fields except site_id and item_id are optional.',
+        inputSchema: {
+          site_id: z.string().describe('UUID of the site'),
+          item_id: z.string().describe('UUID of the menu item to update'),
+          label: z.string().optional().describe('New display text'),
+          url: z.string().optional().describe('New link URL'),
+          parent_id: z.string().optional().describe('New parent item UUID (empty to detach)'),
+          sort_order: z.number().optional().describe('New display order'),
+          menu_name: z.string().optional().describe('New menu group name'),
+        },
+      },
+      async ({ site_id, item_id, label, url, parent_id, sort_order, menu_name }) => {
+        try {
+          const item = await this.navigationService.update(site_id, item_id, {
+            label,
+            url,
+            parentId: parent_id,
+            sortOrder: sort_order,
+            menuName: menu_name,
+          });
+          return ok(item);
+        } catch (e) {
+          return err(e);
+        }
+      },
+    );
+
+    server.registerTool(
+      'delete_menu_item',
+      {
+        description:
+          'Deletes a menu item. Child items are cascade-deleted. Returns a confirmation.',
+        inputSchema: {
+          site_id: z.string().describe('UUID of the site'),
+          item_id: z.string().describe('UUID of the menu item to delete'),
+        },
+      },
+      async ({ site_id, item_id }) => {
+        try {
+          await this.navigationService.remove(site_id, item_id);
+          return ok({ deleted: true });
+        } catch (e) {
+          return err(e);
+        }
+      },
+    );
+
+    server.registerTool(
+      'reorder_menu_items',
+      {
+        description:
+          'Reorders menu items. Pass the item UUIDs in the desired display order. The first UUID gets sort_order 0, the second 1, etc. Items are only reordered within their existing menu group.',
+        inputSchema: {
+          site_id: z.string().describe('UUID of the site'),
+          item_ids: z
+            .array(z.string())
+            .describe('Array of menu item UUIDs in the desired display order'),
+        },
+      },
+      async ({ site_id, item_ids }) => {
+        try {
+          const items = await this.navigationService.reorder(site_id, item_ids);
+          return ok(items);
         } catch (e) {
           return err(e);
         }

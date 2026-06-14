@@ -6,9 +6,17 @@ import { SitesModule } from '../sites/sites.module.js';
 import { ContentTypesModule } from '../content-types/content-types.module.js';
 import { ContentEntriesModule } from '../content-entries/content-entries.module.js';
 import { PagesModule } from '../pages/pages.module.js';
+import { NavigationModule } from '../navigation/navigation.module.js';
 
 @Module({
-  imports: [ThemesModule, SitesModule, ContentTypesModule, ContentEntriesModule, PagesModule],
+  imports: [
+    ThemesModule,
+    SitesModule,
+    ContentTypesModule,
+    ContentEntriesModule,
+    PagesModule,
+    NavigationModule,
+  ],
   controllers: [SiteServeController],
   providers: [SiteServeService],
 })

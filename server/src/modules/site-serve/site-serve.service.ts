@@ -4,6 +4,7 @@ import { ContentEntry, ContentStatus } from '../content-entries/entities/content
 import { ContentType } from '../content-types/entities/content-type.entity.js';
 import { Page, PageStatus } from '../pages/entities/page.entity.js';
 import { PageSection } from '../pages/entities/page-section.entity.js';
+import { MenuItem } from '../navigation/entities/menu-item.entity.js';
 import { SiteTheme } from '../themes/entities/site-theme.entity.js';
 import { ThemeComponent } from '../themes/entities/theme-component.entity.js';
 import { ThemesService } from '../themes/themes.service.js';
@@ -240,14 +241,15 @@ export class SiteServeService {
     return this.buildDocument(pageTitle, site.name, theme, contentHtml, siteId);
   }
 
-  private buildDocument(
+  private async buildDocument(
     title: string,
     siteName: string,
     theme: SiteTheme | null,
     contentHtml: string,
     siteId: string,
-  ): string {
+  ): Promise<string> {
     const styles = this.buildThemeStyles(theme);
+    const navHtml = await this.buildNavigation(siteId);
 
     return (
       '<!DOCTYPE html>\n' +
@@ -262,6 +264,7 @@ export class SiteServeService {
       '  <header>\n' +
       '    <nav>\n' +
       `      <a href="/s/${this.escapeHtml(siteId)}" class="site-title">${this.escapeHtml(siteName)}</a>\n` +
+      `${navHtml}` +
       '    </nav>\n' +
       '  </header>\n' +
       '  <main>\n' +
@@ -270,6 +273,22 @@ export class SiteServeService {
       '</body>\n' +
       '</html>\n'
     );
+  }
+
+  private async buildNavigation(siteId: string): Promise<string> {
+    const items = await this.em.find(
+      MenuItem,
+      { site: { id: siteId }, menuName: 'header', parent: null },
+      { orderBy: { sortOrder: 'ASC' } },
+    );
+
+    if (items.length === 0) return '';
+
+    let html = '';
+    for (const item of items) {
+      html += `      <a href="${this.escapeHtml(item.url)}">${this.escapeHtml(item.label)}</a>\n`;
+    }
+    return html;
   }
 
   private buildThemeStyles(theme: SiteTheme | null): string {
