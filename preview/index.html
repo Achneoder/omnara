@@ -1,0 +1,566 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Softeis Kai — Design Preview</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              brand: {
+                pink: '#F9A8C9',
+                'pink-light': '#FDE8F2',
+                'pink-dark': '#E87DB0',
+                cream: '#FFF8F0',
+                sky: '#7EC8E3',
+                'sky-dark': '#4AAEC8',
+                chocolate: '#6B3A2A',
+                vanilla: '#FFF5C2',
+                yogurt: '#FCE4EC',
+              },
+            },
+            fontFamily: {
+              sans: [
+                'Inter',
+                'system-ui',
+                '-apple-system',
+                'BlinkMacSystemFont',
+                'sans-serif',
+              ],
+            },
+          },
+        },
+      };
+    </script>
+    <link
+      rel="preconnect"
+      href="https://fonts.googleapis.com"
+    />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+    />
+    <style>
+      body {
+        font-family: 'Inter', sans-serif;
+        background-color: #fff8f0;
+      }
+      .tab-active {
+        border-bottom: 2px solid #f9a8c9;
+        color: #1a1a1a;
+        font-weight: 600;
+      }
+      .tab-inactive {
+        border-bottom: 2px solid transparent;
+        color: #6b7280;
+      }
+      .flavor-vanilla { background-color: #FFF5C2; }
+      .flavor-chocolate { background-color: #f5e6e0; }
+      .flavor-yogurt { background-color: #FCE4EC; }
+      .flavor-banana { background-color: #FEFCE8; }
+      .flavor-white-chocolate { background-color: #F0F9FF; }
+      .flavor-default { background-color: #FDE8F2; }
+    </style>
+  </head>
+  <body class="min-h-screen text-gray-900">
+    <!-- Config notice (shown when no siteId is configured) -->
+    <div id="config-notice" class="hidden bg-amber-50 border-b border-amber-200 px-4 py-3 text-sm text-amber-800 text-center">
+      <strong>Preview mode:</strong> Set <code class="bg-amber-100 px-1 rounded">?siteId=YOUR_SITE_ID</code> in the URL, or run <code class="bg-amber-100 px-1 rounded">pnpm seed:softeis-kai</code> first.
+    </div>
+
+    <!-- Preview bar -->
+    <div class="bg-gray-900 text-white text-xs px-4 py-2 flex items-center justify-between">
+      <span class="font-medium tracking-wide uppercase">omnara — Design Preview</span>
+      <span id="api-status" class="flex items-center gap-1.5">
+        <span id="status-dot" class="h-2 w-2 rounded-full bg-gray-500"></span>
+        <span id="status-text" class="text-gray-400">connecting…</span>
+      </span>
+    </div>
+
+    <!-- Navigation -->
+    <header class="sticky top-0 z-50 bg-white/95 backdrop-blur border-b border-gray-100 shadow-sm">
+      <div class="max-w-6xl mx-auto px-4 flex items-center justify-between h-16">
+        <a href="#home" class="text-xl font-bold text-gray-900" onclick="showTab('home')">
+          🍦 Softeis Kai
+        </a>
+        <nav class="hidden sm:flex items-center gap-1">
+          <button onclick="showTab('home')" class="tab-nav-btn tab-active px-4 py-2 text-sm transition-colors" data-tab="home">Startseite</button>
+          <button onclick="showTab('sortiment')" class="tab-nav-btn tab-inactive px-4 py-2 text-sm transition-colors" data-tab="sortiment">Sortiment</button>
+          <button onclick="showTab('service')" class="tab-nav-btn tab-inactive px-4 py-2 text-sm transition-colors" data-tab="service">Service</button>
+          <button onclick="showTab('kontakt')" class="tab-nav-btn tab-inactive px-4 py-2 text-sm transition-colors" data-tab="kontakt">Kontakt</button>
+        </nav>
+        <!-- Mobile nav -->
+        <div class="sm:hidden flex gap-2 text-xs">
+          <button onclick="showTab('home')" class="text-gray-600">Start</button>
+          <button onclick="showTab('sortiment')" class="text-gray-600">Sorten</button>
+          <button onclick="showTab('service')" class="text-gray-600">Service</button>
+          <button onclick="showTab('kontakt')" class="text-gray-600">Kontakt</button>
+        </div>
+      </div>
+    </header>
+
+    <!-- ── STARTSEITE ── -->
+    <div id="tab-home" class="tab-content">
+      <!-- Hero -->
+      <section class="relative overflow-hidden bg-gradient-to-br from-brand-pink-light via-brand-cream to-brand-vanilla min-h-[480px] flex items-center">
+        <div class="absolute inset-0 pointer-events-none">
+          <div class="absolute top-8 right-16 w-64 h-64 rounded-full bg-brand-pink opacity-20 blur-3xl"></div>
+          <div class="absolute bottom-0 left-8 w-48 h-48 rounded-full bg-brand-sky opacity-15 blur-2xl"></div>
+        </div>
+        <div class="relative max-w-6xl mx-auto px-4 py-20 text-center w-full">
+          <div class="text-6xl mb-4">🍦</div>
+          <div id="hero-home-headline" class="text-4xl sm:text-5xl font-extrabold text-gray-900 mb-4 leading-tight">
+            Feinstes Softeis seit 25 Jahren
+          </div>
+          <p id="hero-home-subheadline" class="text-lg sm:text-xl text-gray-600 max-w-2xl mx-auto">
+            16 Sorten – hergestellt aus regionalen Zutaten im Leipziger Land
+          </p>
+          <div class="mt-8 flex flex-wrap gap-3 justify-center">
+            <button onclick="showTab('sortiment')" class="bg-brand-pink-dark hover:bg-brand-pink text-white px-6 py-3 rounded-xl font-semibold transition-colors shadow-sm">
+              Alle Sorten entdecken
+            </button>
+            <button onclick="showTab('service')" class="bg-white hover:bg-gray-50 text-gray-800 px-6 py-3 rounded-xl font-semibold transition-colors shadow-sm border border-gray-200">
+              Eiswagen mieten
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Story section -->
+      <section class="max-w-6xl mx-auto px-4 py-16">
+        <div class="grid sm:grid-cols-2 gap-12 items-center">
+          <div>
+            <h2 class="text-3xl font-bold text-gray-900 mb-4">Handgemacht im Leipziger Land</h2>
+            <p id="business-description" class="text-gray-600 leading-relaxed mb-6">
+              Seit 25 Jahren produzieren wir feinstes Softeis aus regionalen Zutaten im Leipziger Land. 16 Sorten feinsten Softeis – für jeden Geschmack etwas dabei.
+            </p>
+            <div class="flex flex-wrap gap-6 text-sm text-gray-500">
+              <div class="flex items-center gap-2">
+                <span class="text-brand-pink-dark text-lg">✓</span>
+                <span>Regionale Zutaten</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="text-brand-pink-dark text-lg">✓</span>
+                <span>Seit 25 Jahren</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="text-brand-pink-dark text-lg">✓</span>
+                <span>16 Sorten</span>
+              </div>
+            </div>
+          </div>
+          <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+            <p class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">Kontakt</p>
+            <div id="home-contact" class="space-y-2 text-gray-700">
+              <div class="flex items-center gap-3">
+                <span>📞</span>
+                <span id="home-phone" class="font-medium">0173 – 566 72 72</span>
+              </div>
+              <div class="flex items-center gap-3">
+                <span>✉️</span>
+                <span id="home-email" class="font-medium">luftballonmann@web.de</span>
+              </div>
+              <div class="flex items-center gap-3">
+                <span>📍</span>
+                <span id="home-address" class="font-medium">Hauptstraße 25, 04567 Hainichen</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Flavor preview -->
+      <section class="bg-white py-16">
+        <div class="max-w-6xl mx-auto px-4">
+          <div class="flex items-center justify-between mb-8">
+            <h2 class="text-2xl font-bold text-gray-900">Beliebte Sorten</h2>
+            <button onclick="showTab('sortiment')" class="text-sm text-brand-pink-dark hover:underline font-medium">Alle 16 Sorten →</button>
+          </div>
+          <div id="home-flavors" class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            <div class="animate-pulse bg-gray-100 rounded-xl h-24"></div>
+            <div class="animate-pulse bg-gray-100 rounded-xl h-24"></div>
+            <div class="animate-pulse bg-gray-100 rounded-xl h-24"></div>
+            <div class="animate-pulse bg-gray-100 rounded-xl h-24"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Service teaser -->
+      <section class="max-w-6xl mx-auto px-4 py-16">
+        <h2 class="text-2xl font-bold text-gray-900 mb-8">Unser Verleih</h2>
+        <div id="home-services" class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div class="animate-pulse bg-gray-100 rounded-xl h-32"></div>
+          <div class="animate-pulse bg-gray-100 rounded-xl h-32"></div>
+          <div class="animate-pulse bg-gray-100 rounded-xl h-32"></div>
+          <div class="animate-pulse bg-gray-100 rounded-xl h-32"></div>
+        </div>
+      </section>
+    </div>
+
+    <!-- ── SORTIMENT ── -->
+    <div id="tab-sortiment" class="tab-content hidden">
+      <section class="bg-gradient-to-br from-brand-pink-light via-brand-cream to-brand-vanilla py-20 text-center">
+        <div class="text-5xl mb-3">🍦</div>
+        <h1 id="hero-sortiment-headline" class="text-4xl font-extrabold text-gray-900 mb-3">Unser Sortiment</h1>
+        <p id="hero-sortiment-subheadline" class="text-lg text-gray-600">16 Sorten feinsten Softeis in traumhaften Kombinationen</p>
+      </section>
+      <section class="max-w-6xl mx-auto px-4 py-16">
+        <div id="flavors-grid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+          <!-- Populated by JS -->
+        </div>
+        <div id="flavors-loading" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+          <!-- Loading skeletons -->
+        </div>
+        <div id="flavors-error" class="hidden text-center py-12 text-red-500"></div>
+      </section>
+    </div>
+
+    <!-- ── SERVICE ── -->
+    <div id="tab-service" class="tab-content hidden">
+      <section class="bg-gradient-to-br from-brand-sky/20 via-brand-cream to-white py-20 text-center">
+        <div class="text-5xl mb-3">🚐</div>
+        <h1 id="hero-service-headline" class="text-4xl font-extrabold text-gray-900 mb-3">Unser Service</h1>
+        <p id="hero-service-subheadline" class="text-lg text-gray-600">Eiswagen, Anhänger, Theken und Zuckerwatte für Ihre Veranstaltung</p>
+      </section>
+      <section class="max-w-6xl mx-auto px-4 py-16">
+        <div id="services-grid" class="grid sm:grid-cols-2 gap-6">
+          <!-- Populated by JS -->
+        </div>
+        <div id="services-loading" class="grid sm:grid-cols-2 gap-6">
+          <!-- Loading skeletons -->
+        </div>
+        <div id="services-error" class="hidden text-center py-12 text-red-500"></div>
+
+        <!-- CTA -->
+        <div class="mt-16 bg-gray-900 rounded-2xl p-8 text-center text-white">
+          <h2 class="text-2xl font-bold mb-2">Jetzt anfragen</h2>
+          <p class="text-gray-400 mb-4">Wir beraten Sie gerne zu Ihrem Event</p>
+          <a id="service-phone-cta" href="tel:+491735667272" class="inline-block bg-brand-pink-dark hover:bg-brand-pink text-white font-semibold px-6 py-3 rounded-xl transition-colors">
+            📞 0173 – 566 72 72
+          </a>
+        </div>
+      </section>
+    </div>
+
+    <!-- ── KONTAKT ── -->
+    <div id="tab-kontakt" class="tab-content hidden">
+      <section class="bg-gradient-to-br from-brand-cream to-white py-20 text-center">
+        <div class="text-5xl mb-3">📍</div>
+        <h1 id="hero-kontakt-headline" class="text-4xl font-extrabold text-gray-900 mb-3">Kontakt</h1>
+        <p id="hero-kontakt-subheadline" class="text-lg text-gray-600">Sprechen Sie uns an – wir freuen uns auf Ihre Anfrage</p>
+      </section>
+      <section class="max-w-3xl mx-auto px-4 py-16 space-y-6">
+        <div class="bg-white rounded-2xl p-8 shadow-sm border border-gray-100 space-y-5">
+          <h2 class="text-xl font-bold text-gray-900">Eisspezialitäten Kai Fischer</h2>
+          <div class="space-y-3 text-gray-700">
+            <div class="flex items-start gap-3">
+              <span class="text-xl">👤</span>
+              <div>
+                <p class="text-xs text-gray-400 font-medium uppercase tracking-wide mb-0.5">Inhaber</p>
+                <p id="contact-owner" class="font-medium">Kai Fischer</p>
+              </div>
+            </div>
+            <div class="flex items-start gap-3">
+              <span class="text-xl">📍</span>
+              <div>
+                <p class="text-xs text-gray-400 font-medium uppercase tracking-wide mb-0.5">Adresse</p>
+                <p id="contact-address" class="font-medium">Hauptstraße 25<br/>04567 Hainichen</p>
+              </div>
+            </div>
+            <div class="flex items-start gap-3">
+              <span class="text-xl">📞</span>
+              <div>
+                <p class="text-xs text-gray-400 font-medium uppercase tracking-wide mb-0.5">Telefon</p>
+                <a id="contact-phone" href="tel:+491735667272" class="font-medium text-brand-pink-dark hover:underline">0173 – 566 72 72</a>
+              </div>
+            </div>
+            <div class="flex items-start gap-3">
+              <span class="text-xl">✉️</span>
+              <div>
+                <p class="text-xs text-gray-400 font-medium uppercase tracking-wide mb-0.5">E-Mail</p>
+                <a id="contact-email" href="mailto:luftballonmann@web.de" class="font-medium text-brand-pink-dark hover:underline">luftballonmann@web.de</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Simple contact form (mailto) -->
+        <div class="bg-white rounded-2xl p-8 shadow-sm border border-gray-100">
+          <h2 class="text-xl font-bold text-gray-900 mb-5">Nachricht senden</h2>
+          <form onsubmit="handleContact(event)" class="space-y-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Name</label>
+              <input id="form-name" type="text" required placeholder="Ihr Name"
+                class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-pink focus:border-transparent" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">E-Mail</label>
+              <input id="form-email" type="email" required placeholder="ihre@email.de"
+                class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-pink focus:border-transparent" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Nachricht</label>
+              <textarea id="form-message" rows="4" required placeholder="Ihre Nachricht…"
+                class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-pink focus:border-transparent resize-none"></textarea>
+            </div>
+            <button type="submit"
+              class="w-full bg-brand-pink-dark hover:bg-brand-pink text-white font-semibold py-3 rounded-xl transition-colors">
+              Nachricht senden
+            </button>
+          </form>
+        </div>
+      </section>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-gray-400 py-10 mt-8">
+      <div class="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm">
+        <div>
+          <p class="font-semibold text-white mb-1">🍦 Softeis Kai</p>
+          <p id="footer-address" class="text-gray-500">Hauptstraße 25 · 04567 Hainichen</p>
+        </div>
+        <div class="flex gap-4 text-gray-500 text-xs">
+          <a href="#impressum" onclick="showTab('impressum')" class="hover:text-white transition-colors">Impressum</a>
+          <a href="#datenschutz" onclick="showTab('datenschutz')" class="hover:text-white transition-colors">Datenschutz</a>
+          <span id="footer-year"></span>
+        </div>
+      </div>
+    </footer>
+
+    <!-- Impressum stub -->
+    <div id="tab-impressum" class="tab-content hidden max-w-3xl mx-auto px-4 py-16">
+      <h1 class="text-3xl font-bold mb-6">Impressum</h1>
+      <div class="bg-white rounded-2xl p-8 shadow-sm border border-gray-100 space-y-3 text-gray-700">
+        <p class="font-semibold text-gray-900">Eisspezialitäten Kai Fischer</p>
+        <p id="imprint-address">Hauptstraße 25<br/>04567 Hainichen</p>
+        <p>Telefon: <a id="imprint-phone" href="tel:+491735667272" class="text-brand-pink-dark">0173 – 566 72 72</a></p>
+        <p>E-Mail: <a id="imprint-email" href="mailto:luftballonmann@web.de" class="text-brand-pink-dark">luftballonmann@web.de</a></p>
+        <hr class="border-gray-100" />
+        <p class="text-sm text-gray-500">Steuernummer: 235/219/05298 · Finanzamt Borna</p>
+      </div>
+    </div>
+
+    <!-- Datenschutz stub -->
+    <div id="tab-datenschutz" class="tab-content hidden max-w-3xl mx-auto px-4 py-16">
+      <h1 class="text-3xl font-bold mb-6">Datenschutzerklärung</h1>
+      <div class="bg-white rounded-2xl p-8 shadow-sm border border-gray-100 text-gray-700 space-y-4">
+        <p>Diese Website speichert keine personenbezogenen Daten. Der Inhalt wird über das omnara CMS bereitgestellt.</p>
+        <p>Verantwortlicher: Kai Fischer, Hauptstraße 25, 04567 Hainichen.</p>
+      </div>
+    </div>
+
+    <script>
+      // ── Config ──────────────────────────────────────────────────────────────
+      const params = new URLSearchParams(window.location.search);
+      const SITE_ID = params.get('siteId') || '';
+      const API_URL = params.get('apiUrl') || 'http://localhost:3000';
+
+      if (!SITE_ID) {
+        document.getElementById('config-notice').classList.remove('hidden');
+      }
+
+      // ── Navigation ──────────────────────────────────────────────────────────
+      function showTab(name) {
+        document.querySelectorAll('.tab-content').forEach((el) => el.classList.add('hidden'));
+        const target = document.getElementById(`tab-${name}`);
+        if (target) target.classList.remove('hidden');
+
+        document.querySelectorAll('.tab-nav-btn').forEach((btn) => {
+          if (btn.dataset.tab === name) {
+            btn.className = btn.className.replace('tab-inactive', 'tab-active');
+          } else {
+            btn.className = btn.className.replace('tab-active', 'tab-inactive');
+          }
+        });
+
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+
+      // ── API ─────────────────────────────────────────────────────────────────
+      async function fetchEntries(typeSlug) {
+        if (!SITE_ID) return [];
+        const url = new URL(`/public/sites/${SITE_ID}/entries`, API_URL);
+        if (typeSlug) url.searchParams.set('type', typeSlug);
+        const res = await fetch(url.toString());
+        if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
+        return res.json();
+      }
+
+      function setStatus(ok, text) {
+        const dot = document.getElementById('status-dot');
+        const label = document.getElementById('status-text');
+        dot.className = `h-2 w-2 rounded-full ${ok ? 'bg-green-400' : 'bg-red-400'}`;
+        label.textContent = text;
+        label.className = ok ? 'text-green-300' : 'text-red-300';
+      }
+
+      // ── Renderers ───────────────────────────────────────────────────────────
+      function flavorClass(base) {
+        const map = {
+          vanilla: 'flavor-vanilla',
+          chocolate: 'flavor-chocolate',
+          yogurt: 'flavor-yogurt',
+          banana: 'flavor-banana',
+          'white-chocolate': 'flavor-white-chocolate',
+        };
+        return map[base?.toLowerCase()] || 'flavor-default';
+      }
+
+      function dotColor(base) {
+        const map = {
+          vanilla: 'bg-yellow-300 border-yellow-400',
+          chocolate: 'bg-amber-700 border-amber-800',
+          yogurt: 'bg-pink-300 border-pink-400',
+          banana: 'bg-yellow-200 border-yellow-300',
+          'white-chocolate': 'bg-blue-200 border-blue-300',
+        };
+        return map[base?.toLowerCase()] || 'bg-pink-300 border-pink-400';
+      }
+
+      function renderFlavorCard(b) {
+        return `
+          <article class="rounded-2xl p-5 ${flavorClass(b.base)} border border-white/60 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 cursor-default">
+            <div class="flex items-start gap-3">
+              <div class="mt-0.5 h-4 w-4 shrink-0 rounded-full border-2 ${dotColor(b.base)}"></div>
+              <div>
+                <h3 class="font-semibold text-gray-900 leading-snug">${b.name_de || b.name || ''}</h3>
+                ${b.secondary ? `<p class="mt-0.5 text-xs text-gray-500">${b.base} · ${b.secondary}</p>` : `<p class="mt-0.5 text-xs text-gray-500">${b.base || ''}</p>`}
+              </div>
+            </div>
+          </article>`;
+      }
+
+      function renderServiceCard(b) {
+        return `
+          <article class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-all">
+            <div class="flex items-start justify-between gap-4 mb-3">
+              <h3 class="text-lg font-bold text-gray-900">${b.name || ''}</h3>
+              ${b.includes_staff ? '<span class="shrink-0 text-xs bg-brand-pink-light text-brand-pink-dark font-medium px-2 py-0.5 rounded-full">mit Personal</span>' : ''}
+            </div>
+            <p class="text-gray-600 text-sm leading-relaxed mb-4">${b.description || ''}</p>
+            ${b.ideal_for ? `<p class="text-xs text-gray-400"><span class="font-medium text-gray-500">Ideal für:</span> ${b.ideal_for}</p>` : ''}
+          </article>`;
+      }
+
+      function skeletons(count, h = 'h-24') {
+        return Array.from({ length: count }).map(() =>
+          `<div class="animate-pulse bg-gray-100 rounded-xl ${h}"></div>`
+        ).join('');
+      }
+
+      // ── Data loading ─────────────────────────────────────────────────────────
+      async function loadAll() {
+        document.getElementById('footer-year').textContent = `© ${new Date().getFullYear()} Softeis Kai`;
+
+        // Flavor loading skeletons
+        document.getElementById('flavors-loading').innerHTML = skeletons(8);
+        document.getElementById('home-flavors').innerHTML = skeletons(4);
+        document.getElementById('services-loading').innerHTML = skeletons(4, 'h-32');
+        document.getElementById('home-services').innerHTML = skeletons(4, 'h-32');
+
+        try {
+          // Business info
+          const [biEntries, flavorEntries, serviceEntries, heroEntries] = await Promise.all([
+            fetchEntries('business_info'),
+            fetchEntries('ice_cream_flavor'),
+            fetchEntries('rental_service'),
+            fetchEntries('page_hero'),
+          ]);
+
+          setStatus(true, `${SITE_ID ? 'connected · ' : ''}API live`);
+
+          // Apply business info
+          const bi = biEntries[0]?.body;
+          if (bi) {
+            const phone = bi.phone || '0173 – 566 72 72';
+            const email = bi.email || 'luftballonmann@web.de';
+            const address = `${bi.street || ''}, ${bi.zip || ''} ${bi.city || ''}`.trim().replace(/^,/, '');
+
+            document.getElementById('business-description').textContent = bi.description || '';
+            document.getElementById('home-phone').textContent = phone;
+            document.getElementById('home-email').textContent = email;
+            document.getElementById('home-address').textContent = address;
+            document.getElementById('footer-address').textContent = `${bi.street || ''} · ${bi.zip || ''} ${bi.city || ''}`;
+            document.getElementById('contact-owner').textContent = bi.owner || 'Kai Fischer';
+            document.getElementById('contact-address').innerHTML = `${bi.street || ''}<br/>${bi.zip || ''} ${bi.city || ''}`;
+            document.getElementById('contact-phone').textContent = phone;
+            document.getElementById('contact-phone').href = `tel:+49${phone.replace(/[^0-9]/g, '').replace(/^0/, '')}`;
+            document.getElementById('contact-email').textContent = email;
+            document.getElementById('contact-email').href = `mailto:${email}`;
+            document.getElementById('imprint-address').innerHTML = `${bi.street || ''}<br/>${bi.zip || ''} ${bi.city || ''}`;
+            document.getElementById('imprint-phone').textContent = phone;
+            document.getElementById('imprint-email').textContent = email;
+            document.getElementById('service-phone-cta').textContent = `📞 ${phone}`;
+          }
+
+          // Apply hero texts
+          const heroMap = Object.fromEntries(
+            heroEntries.map((e) => [e.body.page, e.body])
+          );
+          for (const [page, hero] of Object.entries(heroMap)) {
+            const hEl = document.getElementById(`hero-${page}-headline`);
+            const sEl = document.getElementById(`hero-${page}-subheadline`);
+            if (hEl) hEl.textContent = hero.headline || '';
+            if (sEl) sEl.textContent = hero.subheadline || '';
+          }
+
+          // Flavors — sorted by display_order
+          const flavors = flavorEntries
+            .map((e) => e.body)
+            .sort((a, b) => (a.display_order || 0) - (b.display_order || 0));
+
+          document.getElementById('flavors-loading').innerHTML = '';
+          if (flavors.length) {
+            document.getElementById('flavors-grid').innerHTML = flavors.map(renderFlavorCard).join('');
+            document.getElementById('home-flavors').innerHTML = flavors.slice(0, 4).map(renderFlavorCard).join('');
+          } else {
+            document.getElementById('flavors-grid').innerHTML = '<p class="col-span-full text-center text-gray-400 py-8">Keine Sorten gefunden. Seed-Skript ausführen.</p>';
+            document.getElementById('home-flavors').innerHTML = '';
+          }
+
+          // Services — sorted by display_order
+          const services = serviceEntries
+            .map((e) => e.body)
+            .sort((a, b) => (a.display_order || 0) - (b.display_order || 0));
+
+          document.getElementById('services-loading').innerHTML = '';
+          if (services.length) {
+            document.getElementById('services-grid').innerHTML = services.map(renderServiceCard).join('');
+            document.getElementById('home-services').innerHTML = services.map(renderServiceCard).join('');
+          } else {
+            document.getElementById('services-grid').innerHTML = '<p class="col-span-full text-center text-gray-400 py-8">Keine Services gefunden. Seed-Skript ausführen.</p>';
+            document.getElementById('home-services').innerHTML = '';
+          }
+        } catch (err) {
+          setStatus(false, 'API nicht erreichbar');
+          const msg = `<p class="text-red-400 text-sm">${err.message}</p>`;
+          document.getElementById('flavors-loading').innerHTML = '';
+          document.getElementById('flavors-error').classList.remove('hidden');
+          document.getElementById('flavors-error').innerHTML = msg;
+          document.getElementById('services-loading').innerHTML = '';
+          document.getElementById('services-error').classList.remove('hidden');
+          document.getElementById('services-error').innerHTML = msg;
+          document.getElementById('home-flavors').innerHTML = `<p class="col-span-full text-red-400 text-sm">${err.message}</p>`;
+          document.getElementById('home-services').innerHTML = `<p class="col-span-full text-red-400 text-sm">${err.message}</p>`;
+          if (!SITE_ID) {
+            setStatus(false, 'siteId fehlt — siehe Hinweis oben');
+          }
+        }
+      }
+
+      function handleContact(e) {
+        e.preventDefault();
+        const name = document.getElementById('form-name').value;
+        const email = document.getElementById('form-email').value;
+        const message = document.getElementById('form-message').value;
+        const to = document.getElementById('contact-email')?.textContent || 'luftballonmann@web.de';
+        window.location.href = `mailto:${to}?subject=Anfrage von ${encodeURIComponent(name)}&body=${encodeURIComponent(message)}%0A%0AAntwort an: ${encodeURIComponent(email)}`;
+      }
+
+      loadAll();
+    </script>
+  </body>
+</html>

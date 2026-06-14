@@ -4,8 +4,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "pnpm --filter @omnara/server start:dev & pnpm --filter @omnara/client dev & pnpm --filter @omnara/dashboard dev & pnpm --filter @omnara/site dev",
+    "dev": "pnpm --filter @omnara/server start:dev & pnpm --filter @omnara/client dev & pnpm --filter @omnara/dashboard dev",
     "seed:softeis-kai": "npx tsx scripts/seed-softeis-kai.ts",
+    "preview:softeis-kai": "npx serve preview -p 5175",
     "storybook": "pnpm --filter @omnara/ui storybook",
     "build-storybook": "pnpm --filter @omnara/ui build-storybook",
     "prepare": "husky",
