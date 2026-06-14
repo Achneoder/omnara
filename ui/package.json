@@ -8,13 +8,12 @@
     "build-storybook": "storybook build"
   },
   "devDependencies": {
-    "@storybook/addon-essentials": "^8.6.0",
-    "@storybook/addon-svelte-csf": "^5.0.0",
-    "@storybook/blocks": "^8.6.0",
-    "@storybook/svelte": "^8.6.0",
-    "@storybook/svelte-vite": "^8.6.0",
+    "@storybook/addon-docs": "^10.4.4",
+    "@storybook/addon-svelte-csf": "^5.1.2",
+    "@storybook/svelte": "^10.4.4",
+    "@storybook/svelte-vite": "^10.4.4",
     "@sveltejs/vite-plugin-svelte": "^7.1.2",
-    "storybook": "^8.6.18",
+    "storybook": "^10.4.4",
     "svelte": "^5.0.0",
     "typescript": "^5.5.0",
     "vite": "^6.0.0"
