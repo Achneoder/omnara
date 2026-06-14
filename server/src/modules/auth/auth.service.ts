@@ -2,6 +2,7 @@ import { Injectable, UnauthorizedException, BadRequestException } from '@nestjs/
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { EntityManager } from '@mikro-orm/postgresql';
+import type { RequiredEntityData } from '@mikro-orm/core';
 import * as argon2 from 'argon2';
 import { v4 as uuidv4 } from 'uuid';
 import { UsersService } from '../users/users.service.js';
@@ -191,7 +192,9 @@ export class AuthService {
     };
 
     const secret = this.configService.getOrThrow<string>('JWT_SECRET');
-    const expiresIn = this.configService.get<string>('JWT_EXPIRY', '15m');
+    // ConfigService returns string but signAsync expects ms.StringValue — runtime value is always a valid ms string
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const expiresIn = this.configService.get<string>('JWT_EXPIRY', '15m') as any;
 
     const accessToken = await this.jwtService.signAsync(payload, {
       secret,
@@ -210,7 +213,7 @@ export class AuthService {
       tokenHash,
       familyId,
       expiresAt,
-    });
+    } as RequiredEntityData<RefreshToken>);
 
     await this.em.flush();
 

@@ -7,7 +7,7 @@ import {
   BeforeCreate,
   BeforeUpdate,
   Enum,
-} from '@mikro-orm/core';
+} from '@mikro-orm/decorators/legacy';
 import { v4 as uuidv4 } from 'uuid';
 
 export enum UserRole {

@@ -45,6 +45,7 @@ export class SitesService {
 
   async remove(id: string): Promise<void> {
     const site = await this.findOne(id);
-    await this.em.removeAndFlush(site);
+    this.em.remove(site);
+    await this.em.flush();
   }
 }

@@ -24,7 +24,7 @@ const mockEntityManager = {
   findOne: jest.fn(),
   persist: jest.fn(),
   flush: jest.fn(),
-  removeAndFlush: jest.fn(),
+  remove: jest.fn(),
 };
 
 const mockActivityLogService = {
@@ -171,11 +171,12 @@ describe('ContentTypesService', () => {
     it('removes the content type', async () => {
       const ct = { id: 'ct-1' } as ContentType;
       mockEntityManager.findOne.mockResolvedValueOnce(ct);
-      mockEntityManager.removeAndFlush.mockResolvedValueOnce(undefined);
+      mockEntityManager.flush.mockResolvedValueOnce(undefined);
 
       await service.remove('ct-1', 'site-1');
 
-      expect(mockEntityManager.removeAndFlush).toHaveBeenCalledWith(ct);
+      expect(mockEntityManager.remove).toHaveBeenCalledWith(ct);
+      expect(mockEntityManager.flush).toHaveBeenCalled();
     });
 
     it('throws NotFoundException when content type does not exist', async () => {

@@ -1,4 +1,4 @@
-import { Entity, PrimaryKey, Property, ManyToOne, Index } from '@mikro-orm/core';
+import { Entity, PrimaryKey, Property, ManyToOne, Index } from '@mikro-orm/decorators/legacy';
 import { v4 as uuidv4 } from 'uuid';
 import { User } from './user.entity.js';
 
@@ -7,7 +7,7 @@ export class RefreshToken {
   @PrimaryKey({ type: 'uuid' })
   id: string = uuidv4();
 
-  @ManyToOne(() => User, { onDelete: 'cascade' })
+  @ManyToOne(() => User, { deleteRule: 'cascade' })
   user!: User;
 
   @Property()

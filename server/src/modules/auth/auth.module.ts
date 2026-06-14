@@ -18,7 +18,8 @@ import { User } from '../users/entities/user.entity.js';
       useFactory: (configService: ConfigService) => ({
         secret: configService.getOrThrow<string>('JWT_SECRET'),
         signOptions: {
-          expiresIn: configService.get<string>('JWT_EXPIRY', '15m'),
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          expiresIn: configService.get<string>('JWT_EXPIRY', '15m') as any,
           algorithm: 'HS256',
         },
       }),

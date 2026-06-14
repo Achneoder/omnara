@@ -11,7 +11,7 @@ const mockEntityManager = {
   findOne: jest.fn(),
   persist: jest.fn(),
   flush: jest.fn(),
-  removeAndFlush: jest.fn(),
+  remove: jest.fn(),
 };
 
 describe('SitesService', () => {
@@ -124,11 +124,12 @@ describe('SitesService', () => {
     it('removes the site and flushes', async () => {
       const site = { id: 'site-1' } as Site;
       mockEntityManager.findOne.mockResolvedValueOnce(site);
-      mockEntityManager.removeAndFlush.mockResolvedValueOnce(undefined);
+      mockEntityManager.flush.mockResolvedValueOnce(undefined);
 
       await service.remove('site-1');
 
-      expect(mockEntityManager.removeAndFlush).toHaveBeenCalledWith(site);
+      expect(mockEntityManager.remove).toHaveBeenCalledWith(site);
+      expect(mockEntityManager.flush).toHaveBeenCalled();
     });
 
     it('throws NotFoundException when site does not exist', async () => {
