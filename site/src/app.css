@@ -1,0 +1,35 @@
+@import 'tailwindcss';
+
+@theme {
+  --color-brand-pink: #f9a8c9;
+  --color-brand-pink-light: #fde8f3;
+  --color-brand-pink-dark: #e87bae;
+  --color-brand-cream: #fff8f0;
+  --color-brand-cream-dark: #f5ead8;
+  --color-brand-sky: #7ec8e3;
+  --color-brand-sky-dark: #5bb3d0;
+  --color-brand-text: #1a1a1a;
+  --color-brand-text-muted: #6b6b6b;
+  --color-brand-vanilla: #f5e6c8;
+  --color-brand-chocolate: #7b4f2e;
+  --color-brand-yogurt: #f0e4f0;
+}
+
+:root {
+  font-family:
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    sans-serif;
+  color: var(--color-brand-text);
+  background-color: var(--color-brand-cream);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  min-height: 100vh;
+}
