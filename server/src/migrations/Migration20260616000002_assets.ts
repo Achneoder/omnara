@@ -11,6 +11,7 @@ export class Migration20260616000002_assets extends Migration {
         "mime_type"     VARCHAR(255)  NOT NULL,
         "size"          BIGINT        NOT NULL DEFAULT 0,
         "category"      VARCHAR(20)   NOT NULL DEFAULT 'other',
+        "variants"      JSONB         NULL DEFAULT '{}',
         "created_at"    TIMESTAMPTZ   NOT NULL DEFAULT NOW(),
         "updated_at"    TIMESTAMPTZ   NOT NULL DEFAULT NOW(),
         CONSTRAINT "assets_pkey" PRIMARY KEY ("id"),
