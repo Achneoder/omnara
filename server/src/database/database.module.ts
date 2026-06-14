@@ -21,6 +21,7 @@ import { ReflectMetadataProvider } from '@mikro-orm/decorators/legacy';
           pathTs: 'src/migrations',
           glob: '!(*.d).{js,ts}',
         },
+        migrationsRun: true,
         metadataProvider: ReflectMetadataProvider,
         extensions: [Migrator],
         autoLoadEntities: true,
