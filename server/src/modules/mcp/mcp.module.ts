@@ -7,6 +7,7 @@ import { ContentTypesModule } from '../content-types/content-types.module.js';
 import { ContentEntriesModule } from '../content-entries/content-entries.module.js';
 import { MediaReferencesModule } from '../media-references/media-references.module.js';
 import { ApiKeysModule } from '../api-keys/api-keys.module.js';
+import { ThemesModule } from '../themes/themes.module.js';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { ApiKeysModule } from '../api-keys/api-keys.module.js';
     ContentEntriesModule,
     MediaReferencesModule,
     ApiKeysModule,
+    ThemesModule,
   ],
   providers: [McpService, ApiKeyGuard],
   controllers: [McpController],

@@ -6,6 +6,8 @@ import { SitesService } from '../sites/sites.service.js';
 import { ContentTypesService } from '../content-types/content-types.service.js';
 import { ContentEntriesService } from '../content-entries/content-entries.service.js';
 import { MediaReferencesService } from '../media-references/media-references.service.js';
+import { ThemesService } from '../themes/themes.service.js';
+import { ComponentCategory } from '../themes/entities/theme-component.entity.js';
 import { ContentStatus } from '../content-entries/entities/content-entry.entity.js';
 import type { Site } from '../sites/entities/site.entity.js';
 
@@ -38,6 +40,7 @@ export class McpService implements OnApplicationShutdown {
     private readonly contentTypesService: ContentTypesService,
     private readonly contentEntriesService: ContentEntriesService,
     private readonly mediaReferencesService: MediaReferencesService,
+    private readonly themesService: ThemesService,
   ) {}
 
   /**
@@ -399,6 +402,251 @@ export class McpService implements OnApplicationShutdown {
         }
       },
     );
+
+    server.registerTool(
+      'get_site_theme',
+      {
+        description:
+          'Returns the active theme for a site including name, version, design tokens (CSS custom property map), and a summary of all registered components (id, slug, name, category, propsSchema). Read this before rendering or modifying theme assets.',
+        inputSchema: {
+          site_id: z.string().describe('The UUID of the site to fetch the theme for'),
+        },
+      },
+      async ({ site_id }) => {
+        try {
+          const theme = await this.themesService.getTheme(site_id);
+          if (!theme) {
+            return ok(null);
+          }
+          return ok({
+            id: theme.id,
+            name: theme.name,
+            version: theme.version,
+            tokens: theme.tokens,
+            components: theme.components.getItems().map((c) => ({
+              id: c.id,
+              slug: c.slug,
+              name: c.name,
+              category: c.category,
+              propsSchema: c.propsSchema,
+            })),
+          });
+        } catch (e) {
+          return err(e);
+        }
+      },
+    );
+
+    server.registerTool(
+      'import_theme',
+      {
+        description:
+          'Imports or replaces the theme for a site in one atomic operation. Provide theme metadata (name, version, tokens map, optional rawCss) and an array of components. Existing components matched by slug are updated; new slugs are created. Returns the full updated theme.',
+        inputSchema: {
+          site_id: z.string().describe('The UUID of the site to import the theme into'),
+          theme: z
+            .object({
+              name: z.string().describe('Human-readable theme name'),
+              version: z.string().describe('Semantic version string, e.g. "1.0.0"'),
+              tokens: z
+                .record(z.string())
+                .describe('CSS custom property map, e.g. { "--color-primary": "#ff0000" }'),
+              raw_css: z
+                .string()
+                .optional()
+                .nullable()
+                .describe('Raw CSS injected after token declarations; sanitized server-side'),
+            })
+            .describe('Theme metadata'),
+          components: z
+            .array(
+              z.object({
+                slug: z.string().describe('URL-safe unique identifier for the component'),
+                name: z.string().describe('Display name'),
+                category: z
+                  .enum([
+                    ComponentCategory.LAYOUT,
+                    ComponentCategory.HERO,
+                    ComponentCategory.CARD,
+                    ComponentCategory.ARTICLE,
+                    ComponentCategory.PRODUCT,
+                    ComponentCategory.MEDIA,
+                    ComponentCategory.CTA,
+                    ComponentCategory.NAV,
+                    ComponentCategory.FOOTER,
+                    ComponentCategory.MISC,
+                  ])
+                  .describe('Semantic category'),
+                template: z.string().describe('HTML template with {{placeholder}} syntax'),
+                css: z.string().optional().nullable().describe('Scoped component CSS'),
+                props_schema: z
+                  .record(z.string())
+                  .optional()
+                  .describe('Maps placeholder names to ContentEntry.body keys'),
+              }),
+            )
+            .optional()
+            .describe('Components to upsert into the theme'),
+        },
+      },
+      async ({ site_id, theme, components }) => {
+        try {
+          const result = await this.themesService.importTheme(site_id, {
+            theme: {
+              name: theme.name,
+              version: theme.version,
+              tokens: theme.tokens,
+              rawCss: theme.raw_css,
+            },
+            components: components?.map((c) => ({
+              slug: c.slug,
+              name: c.name,
+              category: c.category,
+              template: c.template,
+              css: c.css,
+              propsSchema: c.props_schema,
+            })),
+          });
+          return ok(result);
+        } catch (e) {
+          return err(e);
+        }
+      },
+    );
+
+    server.registerTool(
+      'list_theme_components',
+      {
+        description:
+          'Lists all components registered in the site theme, including full details: slug, name, category, template HTML, scoped CSS, and propsSchema. Use this to browse available components before assigning them to content types.',
+        inputSchema: {
+          site_id: z.string().describe('The UUID of the site whose components to list'),
+        },
+      },
+      async ({ site_id }) => {
+        try {
+          const components = await this.themesService.listComponents(site_id);
+          return ok(components);
+        } catch (e) {
+          return err(e);
+        }
+      },
+    );
+
+    server.registerTool(
+      'get_theme_component',
+      {
+        description:
+          'Fetches a single theme component by its slug, including the full template HTML, scoped CSS, and propsSchema. Use before updating a component to read its current state.',
+        inputSchema: {
+          site_id: z.string().describe('The UUID of the site the component belongs to'),
+          slug: z.string().describe('The slug identifier of the component to fetch'),
+        },
+      },
+      async ({ site_id, slug }) => {
+        try {
+          const component = await this.themesService.getComponent(site_id, slug);
+          return ok(component);
+        } catch (e) {
+          return err(e);
+        }
+      },
+    );
+
+    server.registerTool(
+      'upsert_theme_component',
+      {
+        description:
+          'Creates or updates a theme component identified by its slug. If a component with the given slug already exists in the site theme it is updated; otherwise a new one is created. Returns the upserted component.',
+        inputSchema: {
+          site_id: z.string().describe('The UUID of the site'),
+          slug: z.string().describe('URL-safe unique identifier for the component'),
+          name: z.string().describe('Display name'),
+          category: z
+            .enum([
+              ComponentCategory.LAYOUT,
+              ComponentCategory.HERO,
+              ComponentCategory.CARD,
+              ComponentCategory.ARTICLE,
+              ComponentCategory.PRODUCT,
+              ComponentCategory.MEDIA,
+              ComponentCategory.CTA,
+              ComponentCategory.NAV,
+              ComponentCategory.FOOTER,
+              ComponentCategory.MISC,
+            ])
+            .describe('Semantic category'),
+          template: z.string().describe('HTML template with {{placeholder}} syntax'),
+          css: z.string().optional().nullable().describe('Scoped component CSS'),
+          props_schema: z
+            .record(z.string())
+            .optional()
+            .describe('Maps placeholder names to ContentEntry.body keys'),
+        },
+      },
+      async ({ site_id, slug, name, category, template, css, props_schema }) => {
+        try {
+          const component = await this.themesService.upsertComponent(site_id, slug, {
+            name,
+            category,
+            template,
+            css,
+            propsSchema: props_schema,
+          });
+          return ok(component);
+        } catch (e) {
+          return err(e);
+        }
+      },
+    );
+
+    server.registerTool(
+      'delete_theme_component',
+      {
+        description:
+          'Permanently deletes a theme component by slug. Any content types assigned this component will have their component reference cleared (set null). This action is irreversible.',
+        inputSchema: {
+          site_id: z.string().describe('The UUID of the site the component belongs to'),
+          slug: z.string().describe('The slug of the component to delete'),
+        },
+      },
+      async ({ site_id, slug }) => {
+        try {
+          await this.themesService.deleteComponent(site_id, slug);
+          return ok({ deleted: true });
+        } catch (e) {
+          return err(e);
+        }
+      },
+    );
+
+    server.registerTool(
+      'assign_component_to_content_type',
+      {
+        description:
+          'Assigns a theme component to a content type so that the client knows which component template to use when rendering entries of that type. Pass null for component_slug to remove an existing assignment.',
+        inputSchema: {
+          site_id: z.string().describe('The UUID of the site'),
+          content_type_slug: z.string().describe('The slug of the content type to update'),
+          component_slug: z
+            .string()
+            .nullable()
+            .describe('The slug of the component to assign, or null to clear the assignment'),
+        },
+      },
+      async ({ site_id, content_type_slug, component_slug }) => {
+        try {
+          await this.themesService.assignComponentToContentType(
+            site_id,
+            content_type_slug,
+            component_slug,
+          );
+          return ok({ assigned: true });
+        } catch (e) {
+          return err(e);
+        }
+      },
+    );
   }
 
   // ---------------------------------------------------------------------------
@@ -492,6 +740,99 @@ export class McpService implements OnApplicationShutdown {
             },
           ],
         };
+      },
+    );
+
+    const themeTemplate = new ResourceTemplate('theme://{siteId}', { list: undefined });
+
+    server.registerResource(
+      'site_theme',
+      themeTemplate,
+      {
+        description:
+          'Returns the full theme document for a site: name, version, design tokens (CSS custom property map), rawCss, and a complete index of all registered components (id, slug, name, category, propsSchema). Use this as a single-read snapshot before rendering or building a theme editor.',
+        mimeType: 'application/json',
+      },
+      async (uri, variables) => {
+        const siteId = String(variables['siteId']);
+        const theme = await this.themesService.getTheme(siteId);
+
+        return {
+          contents: [
+            {
+              uri: uri.toString(),
+              mimeType: 'application/json',
+              text: JSON.stringify(
+                theme
+                  ? {
+                      id: theme.id,
+                      name: theme.name,
+                      version: theme.version,
+                      tokens: theme.tokens,
+                      rawCss: theme.rawCss,
+                      components: theme.components.getItems().map((c) => ({
+                        id: c.id,
+                        slug: c.slug,
+                        name: c.name,
+                        category: c.category,
+                        propsSchema: c.propsSchema,
+                      })),
+                      updatedAt: theme.updatedAt,
+                    }
+                  : null,
+              ),
+            },
+          ],
+        };
+      },
+    );
+
+    const themeComponentTemplate = new ResourceTemplate('theme://{siteId}/component/{slug}', {
+      list: undefined,
+    });
+
+    server.registerResource(
+      'theme_component',
+      themeComponentTemplate,
+      {
+        description:
+          'Returns a single theme component identified by site and slug, including the full template HTML, scoped CSS, and propsSchema. Use this when you need to read or render a specific component before modification.',
+        mimeType: 'application/json',
+      },
+      async (uri, variables) => {
+        const siteId = String(variables['siteId']);
+        const slug = String(variables['slug']);
+
+        try {
+          const component = await this.themesService.getComponent(siteId, slug);
+          return {
+            contents: [
+              {
+                uri: uri.toString(),
+                mimeType: 'application/json',
+                text: JSON.stringify({
+                  id: component.id,
+                  slug: component.slug,
+                  name: component.name,
+                  category: component.category,
+                  template: component.template,
+                  css: component.css,
+                  propsSchema: component.propsSchema,
+                }),
+              },
+            ],
+          };
+        } catch {
+          return {
+            contents: [
+              {
+                uri: uri.toString(),
+                mimeType: 'application/json',
+                text: JSON.stringify({ error: `Component "${slug}" not found for site ${siteId}` }),
+              },
+            ],
+          };
+        }
       },
     );
   }

@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { PageData } from './$types';
   import type { ContentTypeField } from '$lib/api';
+  import { renderTemplate } from '$lib/theme/render-template.js';
 
   let { data }: { data: PageData } = $props();
 
@@ -65,33 +66,44 @@
     <p class="mt-2 text-sm text-zinc-400">Published {formatDate(entry.publishedAt)}</p>
   </header>
 
-  <article class="space-y-6">
-    {#each fields as field (field.name)}
-      {@const value = bodyValue(field.name)}
-      {#if value}
-        {#if isRichtext(field)}
-          <div class="prose prose-zinc max-w-none leading-relaxed text-zinc-700">
-            <!-- eslint-disable-next-line svelte/no-at-html-tags -->
-            {@html value}
-          </div>
-        {:else if isUrl(field)}
-          <p class="text-sm text-zinc-500">
-            <span class="font-medium capitalize text-zinc-700"
-              >{field.name.replace(/_/g, ' ')}:
-            </span>
-            <a href={value} class="text-blue-600 underline hover:text-blue-800">{value}</a>
-          </p>
-        {:else}
-          {@const tag = fieldTag(field)}
-          {#if tag === 'h1'}
-            <h1 class="text-3xl font-bold text-zinc-900">{value}</h1>
-          {:else if tag === 'h2'}
-            <h2 class="text-xl font-semibold text-zinc-700">{value}</h2>
+  {#if entry.contentType.component && entry.body}
+    <div data-component={entry.contentType.component.slug}>
+      <!-- eslint-disable-next-line svelte/no-at-html-tags -->
+      {@html renderTemplate(
+        entry.contentType.component.template,
+        entry.body,
+        entry.contentType.component.propsSchema,
+      )}
+    </div>
+  {:else}
+    <article class="space-y-6">
+      {#each fields as field (field.name)}
+        {@const value = bodyValue(field.name)}
+        {#if value}
+          {#if isRichtext(field)}
+            <div class="prose prose-zinc max-w-none leading-relaxed text-zinc-700">
+              <!-- eslint-disable-next-line svelte/no-at-html-tags -->
+              {@html value}
+            </div>
+          {:else if isUrl(field)}
+            <p class="text-sm text-zinc-500">
+              <span class="font-medium capitalize text-zinc-700"
+                >{field.name.replace(/_/g, ' ')}:
+              </span>
+              <a href={value} class="text-blue-600 underline hover:text-blue-800">{value}</a>
+            </p>
           {:else}
-            <p class="text-zinc-600">{value}</p>
+            {@const tag = fieldTag(field)}
+            {#if tag === 'h1'}
+              <h1 class="text-3xl font-bold text-zinc-900">{value}</h1>
+            {:else if tag === 'h2'}
+              <h2 class="text-xl font-semibold text-zinc-700">{value}</h2>
+            {:else}
+              <p class="text-zinc-600">{value}</p>
+            {/if}
           {/if}
         {/if}
-      {/if}
-    {/each}
-  </article>
+      {/each}
+    </article>
+  {/if}
 </main>

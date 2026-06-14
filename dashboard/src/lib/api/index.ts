@@ -8,6 +8,8 @@ import type {
   ContentEntry,
   ContentStatus,
   ActivityLog,
+  SiteTheme,
+  ThemeComponent,
 } from '$lib/types';
 
 function getBaseUrl(): string {
@@ -207,5 +209,41 @@ export const api = {
       request<ActivityLog[]>(
         `/activity${buildQuery(params as Record<string, string | number | undefined>)}`,
       ),
+  },
+
+  theme: {
+    get: (siteId: string) => request<SiteTheme>(`/sites/${siteId}/theme`),
+    update: (
+      siteId: string,
+      dto: Partial<{
+        name: string;
+        version: string;
+        tokens: Record<string, string>;
+        rawCss: string | null;
+      }>,
+    ) =>
+      request<SiteTheme>(`/sites/${siteId}/theme`, { method: 'PATCH', body: JSON.stringify(dto) }),
+    delete: (siteId: string) => request<void>(`/sites/${siteId}/theme`, { method: 'DELETE' }),
+    import: (siteId: string, dto: unknown) =>
+      request<SiteTheme>(`/sites/${siteId}/theme/import`, {
+        method: 'POST',
+        body: JSON.stringify(dto),
+      }),
+    listComponents: (siteId: string) =>
+      request<ThemeComponent[]>(`/sites/${siteId}/theme/components`),
+    getComponent: (siteId: string, slug: string) =>
+      request<ThemeComponent>(`/sites/${siteId}/theme/components/${slug}`),
+    upsertComponent: (siteId: string, slug: string, dto: unknown) =>
+      request<ThemeComponent>(`/sites/${siteId}/theme/components/${slug}`, {
+        method: 'PATCH',
+        body: JSON.stringify(dto),
+      }),
+    deleteComponent: (siteId: string, slug: string) =>
+      request<void>(`/sites/${siteId}/theme/components/${slug}`, { method: 'DELETE' }),
+    assignComponent: (siteId: string, contentTypeSlug: string, componentSlug: string | null) =>
+      request<void>(`/sites/${siteId}/theme/assign-component`, {
+        method: 'POST',
+        body: JSON.stringify({ contentTypeSlug, componentSlug }),
+      }),
   },
 };

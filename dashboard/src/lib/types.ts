@@ -59,3 +59,25 @@ export interface ActivityLog {
   metadata: Record<string, unknown>;
   createdAt: string;
 }
+
+export interface ThemeComponent {
+  id: string;
+  slug: string;
+  name: string;
+  category: string;
+  template: string;
+  css: string | null;
+  propsSchema: Record<string, string>;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface SiteTheme {
+  id: string;
+  name: string;
+  version: string;
+  tokens: Record<string, string>;
+  rawCss: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
