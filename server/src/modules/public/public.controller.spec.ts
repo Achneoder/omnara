@@ -3,10 +3,15 @@ import { NotFoundException } from '@nestjs/common';
 import { EntityManager } from '@mikro-orm/postgresql';
 import { PublicController } from './public.controller.js';
 import { ContentStatus } from '../content-entries/entities/content-entry.entity.js';
+import { ThemesService } from '../themes/themes.service.js';
 
 const mockEm = {
   findOne: jest.fn(),
   find: jest.fn(),
+};
+
+const mockThemesService = {
+  getTheme: jest.fn(),
 };
 
 const mockSite = { id: 'site-1', name: 'Test Site' };
@@ -16,6 +21,7 @@ const mockContentType = {
   name: 'Ice Cream Flavor',
   slug: 'ice_cream_flavor',
   fieldSchema: { name: { type: 'string' } },
+  component: null,
 };
 
 const mockEntry = {
@@ -36,7 +42,10 @@ describe('PublicController', () => {
 
     const module: TestingModule = await Test.createTestingModule({
       controllers: [PublicController],
-      providers: [{ provide: EntityManager, useValue: mockEm }],
+      providers: [
+        { provide: EntityManager, useValue: mockEm },
+        { provide: ThemesService, useValue: mockThemesService },
+      ],
     }).compile();
 
     controller = module.get<PublicController>(PublicController);
@@ -54,7 +63,7 @@ describe('PublicController', () => {
         expect(mockEm.find).toHaveBeenCalledWith(
           expect.anything(),
           { site: { id: 'site-1' }, status: ContentStatus.LIVE },
-          expect.objectContaining({ populate: ['contentType'] }),
+          expect.objectContaining({ populate: expect.arrayContaining(['contentType']) }),
         );
         expect(result).toEqual([
           {
@@ -66,10 +75,36 @@ describe('PublicController', () => {
               id: 'ct-1',
               name: 'Ice Cream Flavor',
               slug: 'ice_cream_flavor',
+              component: null,
             },
             publishedAt: mockEntry.publishedAt,
           },
         ]);
+      });
+
+      it('includes component data when content type has an assigned component', async () => {
+        const contentTypeWithComponent = {
+          ...mockContentType,
+          component: {
+            slug: 'hero',
+            template: '<section>{{title}}</section>',
+            css: null,
+            propsSchema: { title: 'title' },
+          },
+        };
+        const entryWithComponent = { ...mockEntry, contentType: contentTypeWithComponent };
+
+        mockEm.findOne.mockResolvedValueOnce(mockSite);
+        mockEm.find.mockResolvedValueOnce([entryWithComponent]);
+
+        const result = await controller.findEntries('site-1', {});
+
+        expect(result[0].contentType.component).toEqual({
+          slug: 'hero',
+          template: '<section>{{title}}</section>',
+          css: null,
+          propsSchema: { title: 'title' },
+        });
       });
 
       it('filters by content type slug when ?type= is provided', async () => {
@@ -85,7 +120,7 @@ describe('PublicController', () => {
             status: ContentStatus.LIVE,
             contentType: { slug: 'ice_cream_flavor', site: { id: 'site-1' } },
           },
-          expect.objectContaining({ populate: ['contentType'] }),
+          expect.objectContaining({ populate: expect.arrayContaining(['contentType']) }),
         );
       });
 

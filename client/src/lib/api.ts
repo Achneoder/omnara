@@ -4,12 +4,20 @@ export interface ContentTypeField {
   required: boolean;
 }
 
+export interface ThemeComponentRef {
+  slug: string;
+  template: string;
+  css: string | null;
+  propsSchema: Record<string, string>;
+}
+
 export interface ContentType {
   name: string;
   slug: string;
   fieldSchema: {
     fields: ContentTypeField[];
   };
+  component: ThemeComponentRef | null;
 }
 
 export interface ContentEntry {
@@ -72,4 +80,40 @@ export async function fetchEntry(siteId: string, slug: string): Promise<ContentE
     throw new Error(`Entry not found: ${slug}`);
   }
   return entry;
+}
+
+export interface SiteThemeData {
+  id: string;
+  name: string;
+  version: string;
+  tokens: Record<string, string>;
+  rawCss: string | null;
+  components: Array<{
+    id: string;
+    slug: string;
+    name: string;
+    category: string;
+    template: string;
+    css: string | null;
+    propsSchema: Record<string, string>;
+  }>;
+  updatedAt: string;
+}
+
+export async function fetchTheme(
+  siteId: string,
+  prevEtag?: string,
+): Promise<{ data: SiteThemeData | null; etag: string | null }> {
+  const headers: Record<string, string> = {};
+  if (prevEtag) headers['If-None-Match'] = prevEtag;
+
+  const res = await fetch(`${apiUrl}/public/sites/${siteId}/theme`, { headers });
+
+  if (res.status === 304) return { data: null, etag: prevEtag ?? null };
+  if (res.status === 404) return { data: null, etag: null };
+  if (!res.ok) throw new Error(`Theme fetch failed: ${res.status}`);
+
+  const data = (await res.json()) as SiteThemeData;
+  const etag = res.headers.get('etag');
+  return { data, etag };
 }

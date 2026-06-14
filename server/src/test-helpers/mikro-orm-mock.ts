@@ -39,6 +39,7 @@ export const PrimaryKey = () => (_target: unknown, _key: string) => undefined;
 export const ManyToOne = () => (_target: unknown, _key: string) => undefined;
 export const OneToMany = () => (_target: unknown, _key: string) => undefined;
 export const ManyToMany = () => (_target: unknown, _key: string) => undefined;
+export const OneToOne = () => (_target: unknown, _key: string) => undefined;
 export const Unique = () => (_target: unknown, _key: string) => undefined;
 export const Index = () => (_target: unknown, _key: string) => undefined;
 export const Enum = () => (_target: unknown, _key: string) => undefined;
@@ -47,6 +48,30 @@ export const BeforeUpdate = () => (_target: unknown, _key: string) => undefined;
 export const AfterUpdate = () => (_target: unknown, _key: string) => undefined;
 
 export const defineConfig = (config: unknown) => config;
+
+// Collection stub — used as the default initializer for @OneToMany fields in entities.
+// Tests never call real collection methods; this only needs to exist and be constructable.
+export class Collection<T> {
+  private items: T[] = [];
+
+  constructor(_owner: unknown, items?: T[]) {
+    if (items) this.items = items;
+  }
+  getItems(): T[] {
+    return this.items;
+  }
+  add(..._items: T[]): void {}
+  remove(..._items: T[]): void {}
+  contains(_item: T): boolean {
+    return false;
+  }
+  count(): number {
+    return this.items.length;
+  }
+  isInitialized(): boolean {
+    return true;
+  }
+}
 
 export function getRepositoryToken(entity: unknown): string {
   return `${String(entity)}Repository`;

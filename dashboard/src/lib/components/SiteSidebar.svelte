@@ -12,6 +12,7 @@
     label: string;
     href: string;
     icon: string;
+    matchPrefix?: boolean;
   }
 
   const siteNav: NavItem[] = [
@@ -26,6 +27,12 @@
       icon: 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4',
     },
     {
+      label: 'Theme',
+      href: `/sites/${siteId}/theme`,
+      icon: 'M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01',
+      matchPrefix: true,
+    },
+    {
       label: 'API Keys',
       href: `/sites/${siteId}/api-keys`,
       icon: 'M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z',
@@ -37,8 +44,11 @@
     },
   ];
 
-  function isActive(href: string): boolean {
-    return $page.url.pathname === href;
+  function isActive(item: NavItem): boolean {
+    if (item.matchPrefix) {
+      return $page.url.pathname.startsWith(item.href);
+    }
+    return $page.url.pathname === item.href;
   }
 </script>
 
@@ -65,15 +75,15 @@
 
 <nav class="p-3" aria-label="Site navigation">
   <ul class="space-y-0.5" role="list">
-    {#each siteNav as item}
+    {#each siteNav as item (item.href)}
       <li>
         <a
           href={item.href}
           class="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors
-					{isActive(item.href)
+					{isActive(item)
             ? 'bg-indigo-50 text-indigo-700'
             : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'}"
-          aria-current={isActive(item.href) ? 'page' : undefined}
+          aria-current={isActive(item) ? 'page' : undefined}
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"

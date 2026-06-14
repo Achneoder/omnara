@@ -7,6 +7,7 @@ import { SitesService } from '../sites/sites.service.js';
 import { ContentTypesService } from '../content-types/content-types.service.js';
 import { ContentEntriesService } from '../content-entries/content-entries.service.js';
 import { MediaReferencesService } from '../media-references/media-references.service.js';
+import { ThemesService } from '../themes/themes.service.js';
 import { ContentStatus } from '../content-entries/entities/content-entry.entity.js';
 
 // ---------------------------------------------------------------------------
@@ -104,6 +105,18 @@ const mockMediaReferencesService = {
   detach: jest.fn(),
 };
 
+const mockThemesService = {
+  getTheme: jest.fn(),
+  importTheme: jest.fn(),
+  listComponents: jest.fn(),
+  getComponent: jest.fn(),
+  upsertComponent: jest.fn(),
+  deleteComponent: jest.fn(),
+  assignComponentToContentType: jest.fn(),
+  deleteTheme: jest.fn(),
+  updateTheme: jest.fn(),
+};
+
 // ---------------------------------------------------------------------------
 // Test fixtures
 // ---------------------------------------------------------------------------
@@ -155,6 +168,7 @@ describe('McpService', () => {
         { provide: ContentTypesService, useValue: mockContentTypesService },
         { provide: ContentEntriesService, useValue: mockContentEntriesService },
         { provide: MediaReferencesService, useValue: mockMediaReferencesService },
+        { provide: ThemesService, useValue: mockThemesService },
       ],
     }).compile();
 
