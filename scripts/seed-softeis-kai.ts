@@ -10,7 +10,7 @@ if (!SEED_EMAIL || !SEED_PASSWORD) {
 }
 
 interface AuthResponse {
-  access_token: string;
+  accessToken: string;
 }
 
 interface SiteResponse {
@@ -60,7 +60,7 @@ async function login(): Promise<string> {
     body: JSON.stringify({ email: SEED_EMAIL, password: SEED_PASSWORD }),
   });
   console.log('Authenticated.');
-  return data.access_token;
+  return data.accessToken;
 }
 
 async function findOrCreateSite(token: string): Promise<string> {
@@ -148,7 +148,7 @@ async function seed(): Promise<void> {
     token,
     siteId,
     'Business Info',
-    'business_info',
+    'business-info',
     {
       company_name: { type: 'string' },
       owner: { type: 'string' },
@@ -167,7 +167,7 @@ async function seed(): Promise<void> {
     token,
     siteId,
     'Ice Cream Flavor',
-    'ice_cream_flavor',
+    'ice-cream-flavor',
     {
       name: { type: 'string' },
       name_de: { type: 'string' },
@@ -181,7 +181,7 @@ async function seed(): Promise<void> {
     token,
     siteId,
     'Rental Service',
-    'rental_service',
+    'rental-service',
     {
       name: { type: 'string' },
       description: { type: 'string' },
@@ -191,7 +191,7 @@ async function seed(): Promise<void> {
     },
   );
 
-  const pageHeroId = await findOrCreateContentType(token, siteId, 'Page Hero', 'page_hero', {
+  const pageHeroId = await findOrCreateContentType(token, siteId, 'Page Hero', 'page-hero', {
     page: { type: 'string' },
     headline: { type: 'string' },
     subheadline: { type: 'string' },
