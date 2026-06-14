@@ -20,6 +20,10 @@ All core entities and relations exist in the database.
 | `ActivityLog` entity — id, site FK nullable, sessionId, action, entityType, entityId, metadata JSONB, createdAt                     | Complete |
 | `SiteTheme` entity — id, site 1:1 FK, name, version, tokens JSONB, rawCss, timestamps                                               | Complete |
 | `ThemeComponent` entity — id, theme FK, name, slug, category enum, template, css, propsSchema JSONB, timestamps                     | Complete |
+| `Page` entity — id, site FK, title, slug, isHomepage, meta JSONB, status, sortOrder, timestamps                                     | Complete |
+| `PageSection` entity — id, page FK, component FK, sortOrder, props JSONB, timestamps                                                | Complete |
+| `MenuItem` entity — id, site FK, label, url, parent FK (self-ref), sortOrder, menuName, timestamps                                  | Complete |
+| `Asset` entity — id, site FK, originalName, storagePath, mimeType, size, category, variants JSONB, timestamps                       | Complete |
 | All migrations bundled and auto-running on startup                                                                                  | Complete |
 
 ---
@@ -61,39 +65,28 @@ Full CRUD for content types and entries available over REST, including draft →
 
 Agents connecting over SSE can perform all content operations through MCP Tools, read site schema via Resources, and use guided Prompts.
 
-| Task                                                          | Status   |
-| ------------------------------------------------------------- | -------- |
-| API key validation on MCP endpoints                           | Complete |
-| MCP Tool: `list_sites`                                        | Complete |
-| MCP Tool: `list_content_types` (site-scoped)                  | Complete |
-| MCP Tool: `list_content_entries` (filterable)                 | Complete |
-| MCP Tool: `get_content_entry`                                 | Complete |
-| MCP Tool: `create_content_entry`                              | Complete |
-| MCP Tool: `update_content_entry`                              | Complete |
-| MCP Tool: `delete_content_entry`                              | Complete |
-| MCP Tool: `publish_content_entry` / `unpublish_content_entry` | Complete |
-| MCP Tool: `attach_media` / `detach_media`                     | Complete |
-| MCP Tool: `get_site_theme`                                    | Complete |
-| MCP Tool: `import_theme`                                      | Complete |
-| MCP Tool: `list_theme_components`                             | Complete |
-| MCP Tool: `get_theme_component`                               | Complete |
-| MCP Tool: `upsert_theme_component`                            | Complete |
-| MCP Tool: `delete_theme_component`                            | Complete |
-| MCP Tool: `assign_component_to_content_type`                  | Complete |
-| MCP Resource: `omnara://sites/schema`                         | Complete |
-| MCP Resource: `omnara://content-types/{siteId}/{slug}`        | Complete |
-| MCP Resource: `theme://{siteId}`                              | Complete |
-| MCP Resource: `theme://{siteId}/component/{slug}`             | Complete |
-| MCP Prompt: `create_blog_post`                                | Complete |
-| MCP Prompt: `update_product_description`                      | Complete |
-| MCP Prompt: `review_and_publish`                              | Complete |
-| Tool + Resource + Prompt tests (success + error paths)        | Complete |
+**40 MCP tools registered** — full CRUD across sites, content types, entries, themes, pages, navigation, and assets.
+
+| Category        | Tools                                                                                                                                                                                              |
+| --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Sites           | `list_sites`, `create_site`, `update_site`, `delete_site`                                                                                                                                          |
+| Content Types   | `list_content_types`, `create_content_type`, `update_content_type`, `delete_content_type`                                                                                                          |
+| Content Entries | `list_content_entries`, `get_content_entry`, `create_content_entry`, `update_content_entry`, `delete_content_entry`, `publish_content_entry`, `unpublish_content_entry`                            |
+| Media           | `attach_media`, `detach_media`                                                                                                                                                                     |
+| Theme           | `get_site_theme`, `import_theme`, `list_theme_components`, `get_theme_component`, `upsert_theme_component`, `delete_theme_component`, `assign_component_to_content_type`                           |
+| Pages           | `create_page`, `update_page`, `delete_page`, `list_pages`, `get_page`, `add_page_section`, `update_page_section`, `remove_page_section`, `reorder_page_sections`, `publish_page`, `unpublish_page` |
+| Navigation      | `create_menu_item`, `list_menu_items`, `update_menu_item`, `delete_menu_item`, `reorder_menu_items`                                                                                                |
+| Assets          | `upload_asset`, `list_assets`, `delete_asset`                                                                                                                                                      |
+
+**4 MCP Resources** — `omnara://sites/schema`, `omnara://content-types/{siteId}/{slug}`, `theme://{siteId}`, `theme://{siteId}/component/{slug}`
+
+**3 MCP Prompts** — `create_blog_post`, `update_product_description`, `review_and_publish`
 
 ---
 
 ### ✅ Phase 5 — Dashboard UI
 
-Human operators can log in, inspect agent activity, review and approve/reject AI-created content, manage sites, manage API keys, and configure themes.
+Human operators can log in, inspect agent activity, review and approve/reject AI-created content, manage sites, manage API keys, configure themes, browse assets, and manage pages.
 
 | Task                                                                          | Status   |
 | ----------------------------------------------------------------------------- | -------- |
@@ -104,6 +97,7 @@ Human operators can log in, inspect agent activity, review and approve/reject AI
 | Review queue — approve → publish, reject → archive                            | Complete |
 | Activity feed — paginated, filterable by site/action/date                     | Complete |
 | Content browser — table with status filter, inline edit modal, delete         | Complete |
+| Assets media browser — grid view, upload, filter, delete, copy URL            | Complete |
 | Site settings — name, URL, platform, content type CRUD                        | Complete |
 | Theme overview — name, version, token/component counts, import, delete        | Complete |
 | Design tokens editor — inline editing with color swatches, save               | Complete |
@@ -115,40 +109,68 @@ Human operators can log in, inspect agent activity, review and approve/reject AI
 
 ---
 
-### ✅ Phase 6 — MCP Client (Headless Content Consumer)
+### ✅ Phase 6 — Site Serving (SSR)
 
-A Svelte 5 frontend that consumes published content via the public API with theme-driven rendering.
+The NestJS server renders published content as complete HTML pages with full theme integration. Pages, content entries, navigation, and favicons are served at clean URLs.
 
-| Task                                                                          | Status   |
-| ----------------------------------------------------------------------------- | -------- |
-| SvelteKit routing — home, content list, entry detail                          | Complete |
-| Published content listing — card grid with badges and dates                   | Complete |
-| Individual entry view — field-based or component template rendering           | Complete |
-| Theme injection — CSS custom properties, component styles, ETag caching       | Complete |
-| Template rendering engine — `{{placeholder}}` substitution with HTML escaping | Complete |
-| Public API client module                                                      | Complete |
-| Component tests                                                               | Complete |
+| Task                                                                    | Status   |
+| ----------------------------------------------------------------------- | -------- |
+| `SiteServeModule` — server-side HTML rendering with theme injection     | Complete |
+| Public routes at `/s/:siteId/...` — home, content types, entries, pages | Complete |
+| Theme CSS injection — design tokens, raw CSS, component-scoped styles   | Complete |
+| Component template rendering — `{{placeholder}}` substitution           | Complete |
+| Semantic field fallback when no component assigned                      | Complete |
+| Page rendering with multi-section composition                           | Complete |
+| Homepage resolution — published page with `isHomepage` flag             | Complete |
+| Navigation rendering — `menu_name='header'` items in page header        | Complete |
+| Favicon injection — `<link rel="icon">` from uploaded favicon assets    | Complete |
+| Font auto-download — remote font URLs rewritten to local `/assets/...`  | Complete |
+| ETag-cached public theme endpoint                                       | Complete |
+| Unit + integration tests for all rendering paths                        | Complete |
+
+---
+
+### ✅ Phase 7 — Asset Management
+
+First-class file upload, storage abstraction, image optimization, and font handling.
+
+| Task                                                                   | Status   |
+| ---------------------------------------------------------------------- | -------- |
+| `AssetsModule` — entity, service, controller, storage abstraction      | Complete |
+| `AssetStorage` interface — swappable backends (local disk, future S3)  | Complete |
+| `LocalAssetStorage` — writes to `ASSETS_DIR` (default `./uploads`)     | Complete |
+| File upload endpoint — multipart/form-data, 10 MB limit, JWT-protected | Complete |
+| Static asset serving — `GET /assets/:siteId/:assetId/:filename`        | Complete |
+| Font auto-download — remote fonts on theme import → local storage      | Complete |
+| GDPR-safe font serving — no external font requests from visitors       | Complete |
+| Image optimization — sharp: WebP variants at 320/640/1280/1920px       | Complete |
+| Variant metadata in `asset.variants` JSONB column                      | Complete |
+| Favicon upload and auto-injection in served pages                      | Complete |
+| MCP tools — `upload_asset`, `list_assets`, `delete_asset`              | Complete |
+| Dashboard media browser — grid view, upload, filter, delete            | Complete |
+| Unit tests for all asset operations                                    | Complete |
 
 ---
 
 ## Planned Phases
 
-### 🔜 Phase 7 — Media Management
+### 🔜 Phase 8 — Webhooks & Integrations
 
-**Goal:** First-class file upload and image management instead of URL-only references.
+**Goal:** Notify external systems when content changes, enable build triggers and downstream sync.
 
-| Task                                                                    | Scope        |
-| ----------------------------------------------------------------------- | ------------ |
-| File upload endpoints (multipart) with size/type validation             | `server`     |
-| Image optimization pipeline (resize, format conversion, WebP/AVIF)      | `server`     |
-| Media library page in dashboard — browse, search, delete uploaded files | `dashboard`  |
-| MCP tool: `upload_media` — agents can upload images directly            | `server/mcp` |
-| Storage backends — local disk, S3-compatible object storage             | `server`     |
-| Media references linked to uploaded files (not just external URLs)      | `server`     |
+| Task                                                                                                        | Scope        |
+| ----------------------------------------------------------------------------------------------------------- | ------------ |
+| Webhook configuration per site — URL, secret, event types                                                   | `server`     |
+| Event system — entry.created, entry.updated, entry.published, entry.deleted, page.published, theme.imported | `server`     |
+| Outbound HTTP delivery with retry and delivery log                                                          | `server`     |
+| Webhook management page in dashboard                                                                        | `dashboard`  |
+| MCP tools — `create_webhook`, `list_webhooks`, `delete_webhook`                                             | `server/mcp` |
+| WordPress migration tool — import posts, pages, media from WordPress export                                 | `server`     |
+| Shopify product sync — read/write product descriptions via Shopify Admin API                                | `server`     |
 
 ---
 
-### 🔜 Phase 8 — Access Control & Multi-User
+### 🔜 Phase 9 — Access Control & Multi-User
 
 **Goal:** Role-based access control enforcement and multi-user management.
 
@@ -163,7 +185,7 @@ A Svelte 5 frontend that consumes published content via the public API with them
 
 ---
 
-### 🔜 Phase 9 — Content Versioning & History
+### 🔜 Phase 10 — Content Versioning & History
 
 **Goal:** Track content revisions and support rollback.
 
@@ -173,22 +195,7 @@ A Svelte 5 frontend that consumes published content via the public API with them
 | Version history endpoint — list versions for an entry        | `server`     |
 | Rollback endpoint — restore entry to a previous version      | `server`     |
 | Diff view — compare two versions side by side                | `dashboard`  |
-| MCP tool: `list_entry_versions`, `restore_entry_version`     | `server/mcp` |
-
----
-
-### 🔜 Phase 10 — Webhooks & Integrations
-
-**Goal:** Notify external systems when content changes, enable build triggers and downstream sync.
-
-| Task                                                                         | Scope       |
-| ---------------------------------------------------------------------------- | ----------- |
-| Webhook configuration per site — URL, secret, event types                    | `server`    |
-| Event system — entry.created, entry.updated, entry.published, entry.archived | `server`    |
-| Outbound HTTP delivery with retry and delivery log                           | `server`    |
-| Webhook management page in dashboard                                         | `dashboard` |
-| WordPress migration tool — import posts, pages, media from WordPress export  | `server`    |
-| Shopify product sync — read/write product descriptions via Shopify Admin API | `server`    |
+| MCP tools — `list_entry_versions`, `restore_entry_version`   | `server/mcp` |
 
 ---
 
@@ -202,7 +209,6 @@ A Svelte 5 frontend that consumes published content via the public API with them
 | TypeScript SDK package for programmatic API access   | root package |
 | API versioning strategy (URL-based or header-based)  | `server`     |
 | Postman collection or OpenAPI spec for all endpoints | `docs`       |
-| Interactive API playground                           | `docs`       |
 
 ---
 
@@ -242,19 +248,45 @@ A Svelte 5 frontend that consumes published content via the public API with them
     └── ✅ Phase 2 (Sites REST)
             └── ✅ Phase 3 (Content REST + Activity Log)
                     ├── ✅ Phase 4 (MCP Capabilities)
-                    └── ✅ Phase 5 (Dashboard UI)
-✅ Phase 6 (MCP Client) ──depends on── ✅ Phase 3
+                    ├── ✅ Phase 5 (Dashboard UI)
+                    ├── ✅ Phase 6 (Site Serving SSR)
+                    └── ✅ Phase 7 (Asset Management)
 
-🔜 Phase 7 (Media) ──depends on── ✅ Phase 3
-🔜 Phase 8 (Access Control) ──depends on── ✅ Phase 1
-🔜 Phase 9 (Versioning) ──depends on── ✅ Phase 3
-🔜 Phase 10 (Webhooks) ──depends on── ✅ Phase 3
+🔜 Phase 8 (Webhooks) ──depends on── ✅ Phase 3
+🔜 Phase 9 (Access Control) ──depends on── ✅ Phase 2
+🔜 Phase 10 (Versioning) ──depends on── ✅ Phase 3
 🔜 Phase 11 (DX) ──depends on── ✅ Phase 3
 🔜 Phase 12 (Chat Client) ──depends on── ✅ Phase 4
 🔜 Phase 13 (Search) ──depends on── ✅ Phase 3
 ```
 
-Phases 7–13 are independent of each other and can be worked on in any order.
+Phases 8–13 are independent of each other and can be worked on in any order.
+
+---
+
+## Next Steps (2026-06-14)
+
+### Immediate — highest impact for production readiness
+
+| #   | Task                              | Effort | Why                                                |
+| --- | --------------------------------- | ------ | -------------------------------------------------- |
+| 1   | **Webhooks** (Phase 8)            | Small  | Enables SSG rebuilds, CDN purging, downstream sync |
+| 2   | **Content versioning** (Phase 10) | Large  | Major UX win for content editors                   |
+
+### Near-term — polish and completeness
+
+| #   | Task                                    | Effort |
+| --- | --------------------------------------- | ------ |
+| 3   | OpenAPI/Swagger docs (Phase 11)         | Small  |
+| 4   | Full-text search (Phase 13)             | Medium |
+| 5   | Role-based access enforcement (Phase 9) | Medium |
+
+### Longer-term — major features
+
+| #   | Task                              | Effort |
+| --- | --------------------------------- | ------ |
+| 6   | Agent chat interface (Phase 12)   | Large  |
+| 7   | WordPress/Shopify migration tools | Large  |
 
 ---
 
