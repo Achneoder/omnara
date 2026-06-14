@@ -8,6 +8,8 @@ import { McpModule } from './modules/mcp/mcp.module.js';
 import { DatabaseModule } from './database/database.module.js';
 import { UsersModule } from './modules/users/users.module.js';
 import { AuthModule } from './modules/auth/auth.module.js';
+import { SitesModule } from './modules/sites/sites.module.js';
+import { ApiKeysModule } from './modules/api-keys/api-keys.module.js';
 
 @Module({
   imports: [
@@ -17,6 +19,8 @@ import { AuthModule } from './modules/auth/auth.module.js';
     UsersModule,
     AuthModule,
     McpModule,
+    SitesModule,
+    ApiKeysModule,
   ],
   controllers: [AppController],
   providers: [
