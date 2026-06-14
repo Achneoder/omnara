@@ -41,7 +41,7 @@ export interface ContentEntry {
   id: string;
   title: string;
   slug: string;
-  body: string;
+  body: Record<string, unknown> | null;
   status: ContentStatus;
   publishedAt: string | null;
   contentTypeId: string | null;
