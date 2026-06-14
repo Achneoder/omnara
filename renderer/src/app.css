@@ -1,0 +1,15 @@
+@import 'tailwindcss';
+
+@theme {
+  --color-brand-pink: #f9a8c9;
+  --color-brand-pink-light: #fde8f2;
+  --color-brand-pink-dark: #e87db0;
+  --color-brand-cream: #fff8f0;
+  --color-brand-sky: #7ec8e3;
+  --color-brand-sky-dark: #4aaec8;
+  --color-brand-chocolate: #6b3a2a;
+  --color-brand-vanilla: #fff5c2;
+  --color-brand-yogurt: #fce4ec;
+
+  --font-family-sans: 'Inter', system-ui, sans-serif;
+}

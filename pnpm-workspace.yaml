@@ -3,6 +3,7 @@ packages:
   - 'client'
   - 'dashboard'
   - 'ui'
+  - 'renderer'
 allowBuilds:
   '@swc/core': true
   argon2: true
