@@ -35,7 +35,7 @@ curl -X POST http://localhost:3000/auth/login \
 curl -X POST http://localhost:3000/sites/<siteId>/api-keys \
   -H "Authorization: Bearer <your-jwt>" \
   -H "Content-Type: application/json" \
-  -d '{"name": "local-dev"}'
+  -d '{"label": "local-dev"}'
 ```
 
 The response contains the raw key — copy it now, it is not shown again:
