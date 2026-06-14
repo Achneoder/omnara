@@ -15,6 +15,7 @@ import { ContentTypesModule } from './modules/content-types/content-types.module
 import { ContentEntriesModule } from './modules/content-entries/content-entries.module.js';
 import { MediaReferencesModule } from './modules/media-references/media-references.module.js';
 import { PublicModule } from './modules/public/public.module.js';
+import { SiteServeModule } from './modules/site-serve/site-serve.module.js';
 import { ThemesModule } from './modules/themes/themes.module.js';
 
 @Module({
@@ -32,6 +33,7 @@ import { ThemesModule } from './modules/themes/themes.module.js';
     ContentEntriesModule,
     MediaReferencesModule,
     PublicModule,
+    SiteServeModule,
     ThemesModule,
   ],
   controllers: [AppController],
