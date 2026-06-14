@@ -1,0 +1,17 @@
+:root {
+  --shadow-xs: 0 1px 2px rgba(26, 24, 20, 0.06);
+  --shadow-sm: 0 1px 3px rgba(26, 24, 20, 0.08), 0 1px 2px rgba(26, 24, 20, 0.06);
+  --shadow-md: 0 4px 8px rgba(26, 24, 20, 0.08), 0 2px 4px rgba(26, 24, 20, 0.05);
+  --shadow-lg: 0 8px 16px rgba(26, 24, 20, 0.1), 0 4px 8px rgba(26, 24, 20, 0.06);
+  --shadow-xl: 0 20px 40px rgba(26, 24, 20, 0.14), 0 8px 16px rgba(26, 24, 20, 0.08);
+  --shadow-focus: 0 0 0 3px color-mix(in oklch, var(--signal-500) 35%, transparent);
+  --shadow-inset: inset 0 1px 3px rgba(26, 24, 20, 0.08);
+}
+
+[data-theme='dark'] {
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4), 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.4), 0 2px 4px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.5), 0 4px 8px rgba(0, 0, 0, 0.3);
+  --shadow-xl: 0 20px 40px rgba(0, 0, 0, 0.6), 0 8px 16px rgba(0, 0, 0, 0.4);
+}
