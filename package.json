@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "pnpm --filter @omnara/server start:dev & pnpm --filter @omnara/client dev & pnpm --filter @omnara/dashboard dev",
+    "seed:softeis-kai": "npx tsx scripts/seed-softeis-kai.ts",
     "storybook": "pnpm --filter @omnara/ui storybook",
     "build-storybook": "pnpm --filter @omnara/ui build-storybook",
     "prepare": "husky",
