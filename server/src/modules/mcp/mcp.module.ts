@@ -9,6 +9,7 @@ import { MediaReferencesModule } from '../media-references/media-references.modu
 import { ApiKeysModule } from '../api-keys/api-keys.module.js';
 import { ThemesModule } from '../themes/themes.module.js';
 import { PagesModule } from '../pages/pages.module.js';
+import { NavigationModule } from '../navigation/navigation.module.js';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { PagesModule } from '../pages/pages.module.js';
     ApiKeysModule,
     ThemesModule,
     PagesModule,
+    NavigationModule,
   ],
   providers: [McpService, ApiKeyGuard],
   controllers: [McpController],

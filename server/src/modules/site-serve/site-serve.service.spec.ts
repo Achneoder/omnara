@@ -10,7 +10,7 @@ import { ThemeComponent, ComponentCategory } from '../themes/entities/theme-comp
 import { Collection } from '@mikro-orm/core';
 
 const mockEm = {
-  find: jest.fn(),
+  find: jest.fn().mockResolvedValue([]), // default: empty (for navigation queries)
   findOne: jest.fn(),
   count: jest.fn(),
 };
