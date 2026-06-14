@@ -7,7 +7,7 @@ import { SiteServeService } from './site-serve.service.js';
 const mockSiteServeService = {
   renderHomePage: jest.fn(),
   renderContentTypesPage: jest.fn(),
-  renderEntryListPage: jest.fn(),
+  renderBySlug: jest.fn(),
   renderEntryDetailPage: jest.fn(),
 };
 
@@ -65,22 +65,22 @@ describe('SiteServeController', () => {
     });
   });
 
-  describe('GET /s/:siteId/:contentTypeSlug', () => {
-    it('delegates to renderEntryListPage with siteId and contentTypeSlug', async () => {
-      mockSiteServeService.renderEntryListPage.mockResolvedValueOnce('<html>entries</html>');
+  describe('GET /s/:siteId/:slug', () => {
+    it('delegates to renderBySlug with siteId and slug', async () => {
+      mockSiteServeService.renderBySlug.mockResolvedValueOnce('<html>page-or-entries</html>');
 
-      const result = await controller.entryList('site-1', 'blog');
+      const result = await controller.slugHandler('site-1', 'blog');
 
-      expect(mockSiteServeService.renderEntryListPage).toHaveBeenCalledWith('site-1', 'blog');
-      expect(result).toBe('<html>entries</html>');
+      expect(mockSiteServeService.renderBySlug).toHaveBeenCalledWith('site-1', 'blog');
+      expect(result).toBe('<html>page-or-entries</html>');
     });
 
-    it('propagates NotFoundException when content type does not exist', async () => {
-      mockSiteServeService.renderEntryListPage.mockRejectedValueOnce(
+    it('propagates NotFoundException when neither page nor content type matches', async () => {
+      mockSiteServeService.renderBySlug.mockRejectedValueOnce(
         new NotFoundException('Content type "blog" not found for site site-1'),
       );
 
-      await expect(controller.entryList('site-1', 'blog')).rejects.toThrow(NotFoundException);
+      await expect(controller.slugHandler('site-1', 'blog')).rejects.toThrow(NotFoundException);
     });
   });
 
