@@ -102,7 +102,7 @@
             <div
               class="mb-4 max-h-40 overflow-y-auto rounded-lg bg-gray-50 p-3 text-sm text-gray-700"
             >
-              <p class="whitespace-pre-wrap">{entry.body}</p>
+              <pre class="whitespace-pre-wrap">{JSON.stringify(entry.body, null, 2)}</pre>
             </div>
           {/if}
 
