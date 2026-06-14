@@ -3,12 +3,12 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "build": "NODE_OPTIONS=--max-old-space-size=8192 nest build",
+    "build": "nest build",
     "build:migration": "npx mikro-orm migration:create",
     "start": "node dist/main",
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
-    "start:migration": "NODE_OPTIONS=--max-old-space-size=8192 nest build && npx mikro-orm migration:up",
+    "start:migration": "nest build && npx mikro-orm migration:up",
     "start:prod": "node dist/main",
     "test": "jest",
     "test:watch": "jest --watch",
@@ -17,10 +17,10 @@
     "format": "prettier --write \"src/**/*.ts\"",
     "seed": "ts-node -r tsconfig-paths/register src/seeders/seed.ts",
     "mikro-orm": "mikro-orm",
-    "migration:up": "NODE_OPTIONS=--max-old-space-size=8192 nest build && mikro-orm migration:up",
-    "migration:down": "NODE_OPTIONS=--max-old-space-size=8192 nest build && mikro-orm migration:down",
-    "migration:create": "NODE_OPTIONS=--max-old-space-size=8192 nest build && mikro-orm migration:create",
-    "migration:list": "NODE_OPTIONS=--max-old-space-size=8192 nest build && mikro-orm migration:list"
+    "migration:up": "nest build && mikro-orm migration:up",
+    "migration:down": "nest build && mikro-orm migration:down",
+    "migration:create": "nest build && mikro-orm migration:create",
+    "migration:list": "nest build && mikro-orm migration:list"
   },
   "dependencies": {
     "@mikro-orm/core": "^7.1.4",
