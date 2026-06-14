@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "pnpm --filter @omnara/server start:dev & pnpm --filter @omnara/client dev & pnpm --filter @omnara/dashboard dev",
-    "seed:softeis-kai": "npx tsx scripts/seed-softeis-kai.ts",
+    "seed:softeis-kai": "pnpm exec tsx scripts/seed-softeis-kai.ts",
     "preview:softeis-kai": "npx serve preview -p 5175",
     "storybook": "pnpm --filter @omnara/ui storybook",
     "build-storybook": "pnpm --filter @omnara/ui build-storybook",
@@ -26,8 +26,12 @@
     "prettier-plugin-svelte": "^4.0.0",
     "prettier-plugin-tailwindcss": "^0.6.0",
     "svelte-eslint-parser": "^1.0.0",
+    "tsx": "^4.22.4",
     "typescript": "^5.5.0",
     "typescript-eslint": "^8.0.0"
   },
-  "packageManager": "pnpm@11.6.0"
+  "packageManager": "pnpm@11.6.0",
+  "dependencies": {
+    "dotenv": "^17.4.2"
+  }
 }
