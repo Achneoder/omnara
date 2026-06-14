@@ -10,6 +10,7 @@ import type {
   ActivityLog,
   SiteTheme,
   ThemeComponent,
+  AssetDto,
 } from '$lib/types';
 
 function getBaseUrl(): string {
@@ -19,8 +20,9 @@ function getBaseUrl(): string {
 
 async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
   const token = auth.accessToken;
+  const isFormData = init.body instanceof FormData;
   const headers: Record<string, string> = {
-    'Content-Type': 'application/json',
+    ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
     ...(init.headers as Record<string, string>),
   };
 
@@ -40,7 +42,7 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
       throw new ApiError(401, 'Unauthorized');
     }
     const retryHeaders: Record<string, string> = {
-      'Content-Type': 'application/json',
+      ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
       ...(init.headers as Record<string, string>),
       Authorization: `Bearer ${auth.accessToken}`,
     };
@@ -245,5 +247,20 @@ export const api = {
         method: 'POST',
         body: JSON.stringify({ contentTypeSlug, componentSlug }),
       }),
+  },
+
+  assets: {
+    list: (siteId: string, category?: string) =>
+      request<AssetDto[]>(`/sites/${siteId}/assets${buildQuery({ category })}`),
+    upload: (siteId: string, file: File) => {
+      const formData = new FormData();
+      formData.append('file', file);
+      return request<AssetDto>(`/sites/${siteId}/assets/upload`, {
+        method: 'POST',
+        body: formData,
+      });
+    },
+    delete: (siteId: string, id: string) =>
+      request<void>(`/sites/${siteId}/assets/${id}`, { method: 'DELETE' }),
   },
 };
