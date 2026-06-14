@@ -164,6 +164,15 @@ pnpm install
 success "Dependencies installed"
 
 # ─────────────────────────────────────────────
+#  6. Run database migrations
+# ─────────────────────────────────────────────
+step "Running database migrations"
+
+pnpm --filter @omnara/server migration:up
+
+success "Migrations applied"
+
+# ─────────────────────────────────────────────
 #  Done
 # ─────────────────────────────────────────────
 echo ""
