@@ -29,6 +29,6 @@ import { PostgreSqlDriver } from '@mikro-orm/postgresql';
       }),
     }),
   ],
-  exports: [MikroOrmModule],
+  exports: [],
 })
 export class DatabaseModule {}

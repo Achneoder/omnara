@@ -4,9 +4,11 @@ packages:
   - 'dashboard'
   - 'ui'
 allowBuilds:
+  '@swc/core': true
   argon2: true
   esbuild: true
   svelte-preprocess: true
 onlyBuiltDependencies:
   - esbuild
   - argon2
+  - '@swc/core'
