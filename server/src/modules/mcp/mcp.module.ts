@@ -10,6 +10,7 @@ import { ApiKeysModule } from '../api-keys/api-keys.module.js';
 import { ThemesModule } from '../themes/themes.module.js';
 import { PagesModule } from '../pages/pages.module.js';
 import { NavigationModule } from '../navigation/navigation.module.js';
+import { AssetsModule } from '../assets/assets.module.js';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { NavigationModule } from '../navigation/navigation.module.js';
     ThemesModule,
     PagesModule,
     NavigationModule,
+    AssetsModule,
   ],
   providers: [McpService, ApiKeyGuard],
   controllers: [McpController],

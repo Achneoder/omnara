@@ -5,6 +5,7 @@ import { ContentType } from '../content-types/entities/content-type.entity.js';
 import { Page, PageStatus } from '../pages/entities/page.entity.js';
 import { PageSection } from '../pages/entities/page-section.entity.js';
 import { MenuItem } from '../navigation/entities/menu-item.entity.js';
+import { Asset, AssetCategory } from '../assets/entities/asset.entity.js';
 import { SiteTheme } from '../themes/entities/site-theme.entity.js';
 import { ThemeComponent } from '../themes/entities/theme-component.entity.js';
 import { ThemesService } from '../themes/themes.service.js';
@@ -250,6 +251,7 @@ export class SiteServeService {
   ): Promise<string> {
     const styles = this.buildThemeStyles(theme);
     const navHtml = await this.buildNavigation(siteId);
+    const faviconHtml = await this.buildFavicon(siteId);
 
     return (
       '<!DOCTYPE html>\n' +
@@ -258,6 +260,7 @@ export class SiteServeService {
       '  <meta charset="UTF-8">\n' +
       '  <meta name="viewport" content="width=device-width, initial-scale=1.0">\n' +
       `  <title>${this.escapeHtml(title)}</title>\n` +
+      `${faviconHtml}` +
       `${styles}` +
       '</head>\n' +
       '<body>\n' +
@@ -273,6 +276,24 @@ export class SiteServeService {
       '</body>\n' +
       '</html>\n'
     );
+  }
+
+  private async buildFavicon(siteId: string): Promise<string> {
+    const favicons = await this.em.find(
+      Asset,
+      {
+        site: { id: siteId },
+        category: AssetCategory.FAVICON,
+      },
+      { limit: 1, orderBy: { createdAt: 'DESC' } },
+    );
+
+    if (favicons.length === 0) return '';
+
+    const favicon = favicons[0];
+    const url = `/assets/${siteId}/${favicon.id}/${encodeURIComponent(favicon.originalName)}`;
+    const type = favicon.mimeType || 'image/x-icon';
+    return `  <link rel="icon" type="${this.escapeHtml(type)}" href="${this.escapeHtml(url)}">\n`;
   }
 
   private async buildNavigation(siteId: string): Promise<string> {

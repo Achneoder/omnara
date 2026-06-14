@@ -8,12 +8,18 @@ import { ActivityLogService } from '../activity-log/activity-log.service.js';
 import { ImportThemeDto } from './dto/import-theme.dto.js';
 import { UpdateThemeDto } from './dto/update-theme.dto.js';
 import { UpsertComponentDto } from './dto/upsert-component.dto.js';
+import { AssetsService } from '../assets/assets.service.js';
+import { AssetCategory } from '../assets/entities/asset.entity.js';
+
+const FONT_URL_RE =
+  /url\s*\(\s*["']?\s*(https?:\/\/[^"'\s)]+\.(woff2?|ttf|otf|eot))\s*["']?\s*\)/gi;
 
 @Injectable()
 export class ThemesService {
   constructor(
     private readonly em: EntityManager,
     private readonly activityLogService: ActivityLogService,
+    private readonly assetsService: AssetsService,
   ) {}
 
   async getTheme(siteId: string): Promise<SiteTheme | null> {
@@ -25,6 +31,13 @@ export class ThemesService {
   }
 
   async importTheme(siteId: string, dto: ImportThemeDto): Promise<SiteTheme> {
+    // Download remote fonts and rewrite CSS URLs BEFORE the DB transaction
+    // to avoid holding a DB lock during network I/O.
+    let rawCss = dto.theme.rawCss != null ? this.sanitizeRawCss(dto.theme.rawCss) : null;
+    if (rawCss != null) {
+      rawCss = await this.downloadFontsAndRewriteUrls(siteId, rawCss);
+    }
+
     const theme = await this.em.transactional(async (em) => {
       let siteTheme = await em.findOne(SiteTheme, { site: { id: siteId } });
 
@@ -41,7 +54,7 @@ export class ThemesService {
       siteTheme.name = dto.theme.name;
       siteTheme.version = dto.theme.version;
       siteTheme.tokens = dto.theme.tokens;
-      siteTheme.rawCss = dto.theme.rawCss != null ? this.sanitizeRawCss(dto.theme.rawCss) : null;
+      siteTheme.rawCss = rawCss;
 
       for (const componentDto of dto.components ?? []) {
         let component = await em.findOne(ThemeComponent, {
@@ -204,6 +217,56 @@ export class ThemesService {
     }
 
     await this.em.flush();
+  }
+
+  private async downloadFontsAndRewriteUrls(siteId: string, css: string): Promise<string> {
+    const urls = new Map<string, string>(); // original URL → local URL
+
+    // Collect all font URLs from @font-face blocks
+    for (const match of css.matchAll(FONT_URL_RE)) {
+      const url = match[1];
+      if (!urls.has(url)) {
+        urls.set(url, '');
+      }
+    }
+
+    // Download each font and store it
+    for (const [originalUrl] of urls) {
+      try {
+        const response = await fetch(originalUrl);
+        if (!response.ok) {
+          continue;
+        }
+
+        const buffer = Buffer.from(await response.arrayBuffer());
+        const urlPath = new URL(originalUrl).pathname;
+        const originalName = urlPath.split('/').pop() ?? 'font';
+
+        const contentType = response.headers.get('content-type') ?? 'application/octet-stream';
+        const asset = await this.assetsService.store(
+          siteId,
+          buffer,
+          originalName,
+          contentType,
+          AssetCategory.FONT,
+        );
+
+        const localUrl = `/assets/${siteId}/${asset.id}/${encodeURIComponent(originalName)}`;
+        urls.set(originalUrl, localUrl);
+      } catch {
+        // Skip fonts that can't be downloaded — leave original URL intact
+      }
+    }
+
+    // Rewrite URLs in CSS
+    let rewrittenCss = css;
+    for (const [originalUrl, localUrl] of urls) {
+      if (localUrl) {
+        rewrittenCss = rewrittenCss.replaceAll(originalUrl, localUrl);
+      }
+    }
+
+    return rewrittenCss;
   }
 
   private sanitizeRawCss(css: string): string {
