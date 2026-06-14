@@ -34,6 +34,7 @@ async function bootstrap(): Promise<void> {
     origin: [
       configService.get('CLIENT_URL', 'http://localhost:5173'),
       configService.get('DASHBOARD_URL', 'http://localhost:5174'),
+      configService.get('RENDERER_URL', 'http://localhost:5176'),
     ],
     methods: ['GET', 'POST', 'PATCH', 'DELETE'],
     allowedHeaders: ['Content-Type', 'x-api-key', 'Authorization'],

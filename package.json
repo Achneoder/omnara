@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "pnpm --filter @omnara/server start:dev & pnpm --filter @omnara/client dev & pnpm --filter @omnara/dashboard dev",
+    "dev:renderer": "pnpm --filter @omnara/renderer dev",
     "seed:softeis-kai": "pnpm exec tsx scripts/seed-softeis-kai.ts",
     "preview:softeis-kai": "npx serve preview -p 5175",
     "storybook": "pnpm --filter @omnara/ui storybook",
