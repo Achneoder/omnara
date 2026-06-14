@@ -6,6 +6,7 @@ import { SiteTheme } from './entities/site-theme.entity.js';
 import { ThemeComponent, ComponentCategory } from './entities/theme-component.entity.js';
 import { ContentType } from '../content-types/entities/content-type.entity.js';
 import { ActivityLogService } from '../activity-log/activity-log.service.js';
+import { AssetsService } from '../assets/assets.service.js';
 import { ImportThemeDto } from './dto/import-theme.dto.js';
 import { UpsertComponentDto } from './dto/upsert-component.dto.js';
 
@@ -23,6 +24,11 @@ const mockActivityLogService = {
   log: jest.fn().mockResolvedValue(undefined),
 };
 
+const mockAssetsService = {
+  store: jest.fn(),
+  findAll: jest.fn(),
+};
+
 describe('ThemesService', () => {
   let service: ThemesService;
 
@@ -34,6 +40,7 @@ describe('ThemesService', () => {
         ThemesService,
         { provide: EntityManager, useValue: mockEntityManager },
         { provide: ActivityLogService, useValue: mockActivityLogService },
+        { provide: AssetsService, useValue: mockAssetsService },
       ],
     }).compile();
 

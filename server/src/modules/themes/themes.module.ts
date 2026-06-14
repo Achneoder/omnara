@@ -6,9 +6,15 @@ import { ThemesService } from './themes.service.js';
 import { ThemesController } from './themes.controller.js';
 import { AuthModule } from '../auth/auth.module.js';
 import { ActivityLogModule } from '../activity-log/activity-log.module.js';
+import { AssetsModule } from '../assets/assets.module.js';
 
 @Module({
-  imports: [MikroOrmModule.forFeature([SiteTheme, ThemeComponent]), AuthModule, ActivityLogModule],
+  imports: [
+    MikroOrmModule.forFeature([SiteTheme, ThemeComponent]),
+    AuthModule,
+    ActivityLogModule,
+    AssetsModule,
+  ],
   providers: [ThemesService],
   controllers: [ThemesController],
   exports: [ThemesService],

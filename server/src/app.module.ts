@@ -11,6 +11,7 @@ import { AuthModule } from './modules/auth/auth.module.js';
 import { SitesModule } from './modules/sites/sites.module.js';
 import { ApiKeysModule } from './modules/api-keys/api-keys.module.js';
 import { ActivityLogModule } from './modules/activity-log/activity-log.module.js';
+import { AssetsModule } from './modules/assets/assets.module.js';
 import { ContentTypesModule } from './modules/content-types/content-types.module.js';
 import { ContentEntriesModule } from './modules/content-entries/content-entries.module.js';
 import { MediaReferencesModule } from './modules/media-references/media-references.module.js';
@@ -31,6 +32,7 @@ import { ThemesModule } from './modules/themes/themes.module.js';
     SitesModule,
     ApiKeysModule,
     ActivityLogModule,
+    AssetsModule,
     ContentTypesModule,
     ContentEntriesModule,
     MediaReferencesModule,

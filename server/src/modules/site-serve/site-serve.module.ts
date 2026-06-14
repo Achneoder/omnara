@@ -7,6 +7,7 @@ import { ContentTypesModule } from '../content-types/content-types.module.js';
 import { ContentEntriesModule } from '../content-entries/content-entries.module.js';
 import { PagesModule } from '../pages/pages.module.js';
 import { NavigationModule } from '../navigation/navigation.module.js';
+import { AssetsModule } from '../assets/assets.module.js';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { NavigationModule } from '../navigation/navigation.module.js';
     ContentEntriesModule,
     PagesModule,
     NavigationModule,
+    AssetsModule,
   ],
   controllers: [SiteServeController],
   providers: [SiteServeService],

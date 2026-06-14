@@ -10,6 +10,7 @@ import { MediaReferencesService } from '../media-references/media-references.ser
 import { ThemesService } from '../themes/themes.service.js';
 import { PagesService } from '../pages/pages.service.js';
 import { NavigationService } from '../navigation/navigation.service.js';
+import { AssetsService } from '../assets/assets.service.js';
 import { ContentStatus } from '../content-entries/entities/content-entry.entity.js';
 
 // ---------------------------------------------------------------------------
@@ -143,6 +144,14 @@ const mockNavigationService = {
   reorder: jest.fn(),
 };
 
+const mockAssetsService = {
+  store: jest.fn(),
+  findOne: jest.fn(),
+  findAll: jest.fn(),
+  remove: jest.fn(),
+  getAbsolutePath: jest.fn(),
+};
+
 // ---------------------------------------------------------------------------
 // Test fixtures
 // ---------------------------------------------------------------------------
@@ -197,6 +206,7 @@ describe('McpService', () => {
         { provide: ThemesService, useValue: mockThemesService },
         { provide: PagesService, useValue: mockPagesService },
         { provide: NavigationService, useValue: mockNavigationService },
+        { provide: AssetsService, useValue: mockAssetsService },
       ],
     }).compile();
 

@@ -9,6 +9,8 @@ import { MediaReferencesService } from '../media-references/media-references.ser
 import { ThemesService } from '../themes/themes.service.js';
 import { PagesService } from '../pages/pages.service.js';
 import { NavigationService } from '../navigation/navigation.service.js';
+import { AssetsService } from '../assets/assets.service.js';
+import { AssetCategory } from '../assets/entities/asset.entity.js';
 import { ComponentCategory } from '../themes/entities/theme-component.entity.js';
 import { ContentStatus } from '../content-entries/entities/content-entry.entity.js';
 import { PageStatus } from '../pages/entities/page.entity.js';
@@ -47,6 +49,7 @@ export class McpService implements OnApplicationShutdown {
     private readonly themesService: ThemesService,
     private readonly pagesService: PagesService,
     private readonly navigationService: NavigationService,
+    private readonly assetsService: AssetsService,
   ) {}
 
   /**
@@ -1279,6 +1282,122 @@ export class McpService implements OnApplicationShutdown {
         try {
           const items = await this.navigationService.reorder(site_id, item_ids);
           return ok(items);
+        } catch (e) {
+          return err(e);
+        }
+      },
+    );
+
+    // -------------------------------------------------------------------------
+    // Asset tools
+    // -------------------------------------------------------------------------
+
+    server.registerTool(
+      'upload_asset',
+      {
+        description:
+          'Uploads a file as a site asset by downloading it from a URL. Use this for images, fonts, favicons, and other static files needed by the site. Returns the asset metadata including the local serving URL. For local files, use the dashboard upload endpoint instead.',
+        inputSchema: {
+          site_id: z.string().describe('UUID of the site'),
+          url: z.string().describe('Publicly accessible URL of the file to download'),
+          category: z
+            .enum([
+              AssetCategory.IMAGE,
+              AssetCategory.FONT,
+              AssetCategory.FAVICON,
+              AssetCategory.OTHER,
+            ])
+            .optional()
+            .describe('Asset category — defaults to "other"'),
+        },
+      },
+      async ({ site_id, url, category }) => {
+        try {
+          const response = await fetch(url);
+          if (!response.ok) {
+            return err(new Error(`Failed to download: HTTP ${response.status}`));
+          }
+
+          const buffer = Buffer.from(await response.arrayBuffer());
+          const urlPath = new URL(url).pathname;
+          const originalName = urlPath.split('/').pop() ?? 'file';
+          const contentType = response.headers.get('content-type') ?? 'application/octet-stream';
+
+          const asset = await this.assetsService.store(
+            site_id,
+            buffer,
+            originalName,
+            contentType,
+            (category as AssetCategory) ?? AssetCategory.OTHER,
+          );
+
+          return ok({
+            id: asset.id,
+            originalName: asset.originalName,
+            mimeType: asset.mimeType,
+            size: asset.size,
+            category: asset.category,
+            url: `/assets/${site_id}/${asset.id}/${encodeURIComponent(asset.originalName)}`,
+          });
+        } catch (e) {
+          return err(e);
+        }
+      },
+    );
+
+    server.registerTool(
+      'list_assets',
+      {
+        description:
+          'Lists all assets for a site, optionally filtered by category (image, font, favicon, other). Returns metadata and local serving URLs.',
+        inputSchema: {
+          site_id: z.string().describe('UUID of the site'),
+          category: z
+            .enum([
+              AssetCategory.IMAGE,
+              AssetCategory.FONT,
+              AssetCategory.FAVICON,
+              AssetCategory.OTHER,
+            ])
+            .optional()
+            .describe('Filter by asset category'),
+        },
+      },
+      async ({ site_id, category }) => {
+        try {
+          const assets = await this.assetsService.findAll(
+            site_id,
+            category as AssetCategory | undefined,
+          );
+          return ok(
+            assets.map((a) => ({
+              id: a.id,
+              originalName: a.originalName,
+              mimeType: a.mimeType,
+              size: a.size,
+              category: a.category,
+              url: `/assets/${site_id}/${a.id}/${encodeURIComponent(a.originalName)}`,
+            })),
+          );
+        } catch (e) {
+          return err(e);
+        }
+      },
+    );
+
+    server.registerTool(
+      'delete_asset',
+      {
+        description: 'Deletes an asset (file + database record). Returns a confirmation.',
+        inputSchema: {
+          site_id: z.string().describe('UUID of the site'),
+          asset_id: z.string().describe('UUID of the asset to delete'),
+        },
+      },
+      async ({ site_id, asset_id }) => {
+        try {
+          await this.assetsService.remove(site_id, asset_id);
+          return ok({ deleted: true });
         } catch (e) {
           return err(e);
         }
