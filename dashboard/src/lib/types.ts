@@ -81,3 +81,13 @@ export interface SiteTheme {
   createdAt: string;
   updatedAt: string;
 }
+
+export interface AssetDto {
+  id: string;
+  originalName: string;
+  mimeType: string;
+  size: number;
+  category: string;
+  url: string;
+  variants: Record<string, string>;
+}
