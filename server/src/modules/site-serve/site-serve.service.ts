@@ -2,6 +2,9 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { EntityManager } from '@mikro-orm/postgresql';
 import { ContentEntry, ContentStatus } from '../content-entries/entities/content-entry.entity.js';
 import { ContentType } from '../content-types/entities/content-type.entity.js';
+import { Page, PageStatus } from '../pages/entities/page.entity.js';
+import { PageSection } from '../pages/entities/page-section.entity.js';
+import { MenuItem } from '../navigation/entities/menu-item.entity.js';
 import { SiteTheme } from '../themes/entities/site-theme.entity.js';
 import { ThemeComponent } from '../themes/entities/theme-component.entity.js';
 import { ThemesService } from '../themes/themes.service.js';
@@ -16,6 +19,16 @@ export class SiteServeService {
   ) {}
 
   async renderHomePage(siteId: string): Promise<string> {
+    // Check for a published homepage page first
+    const homepagePage = await this.em.findOne(Page, {
+      site: { id: siteId },
+      isHomepage: true,
+      status: PageStatus.PUBLISHED,
+    });
+    if (homepagePage) {
+      return this.renderPage(homepagePage, siteId);
+    }
+
     const site = await this.sitesService.findOne(siteId);
     const theme = await this.themesService.getTheme(siteId);
 
@@ -79,6 +92,21 @@ export class SiteServeService {
     }
 
     return this.buildDocument(`Content Types | ${site.name}`, site.name, theme, content, siteId);
+  }
+
+  async renderBySlug(siteId: string, slug: string): Promise<string> {
+    // Check for a published page first
+    const page = await this.em.findOne(Page, {
+      site: { id: siteId },
+      slug,
+      status: PageStatus.PUBLISHED,
+    });
+    if (page) {
+      return this.renderPage(page, siteId);
+    }
+
+    // Fall back to content type entry listing
+    return this.renderEntryListPage(siteId, slug);
   }
 
   async renderEntryListPage(siteId: string, contentTypeSlug: string): Promise<string> {
@@ -178,14 +206,50 @@ export class SiteServeService {
   // Private helpers
   // ---------------------------------------------------------------------------
 
-  private buildDocument(
+  private async renderPage(page: Page, siteId: string): Promise<string> {
+    const site = await this.sitesService.findOne(siteId);
+    const theme = await this.themesService.getTheme(siteId);
+
+    const sections = await this.em.find(
+      PageSection,
+      { page: { id: page.id } },
+      {
+        populate: ['component'] as never,
+        orderBy: { sortOrder: 'ASC' },
+      },
+    );
+
+    let contentHtml = '';
+    if (sections.length === 0) {
+      contentHtml = '<p>This page has no sections yet.</p>\n';
+    } else {
+      for (const section of sections) {
+        const rendered = this.renderTemplate(
+          section.component.template,
+          section.props ?? {},
+          section.component.propsSchema,
+        );
+        contentHtml += `<section data-component="${this.escapeHtml(section.component.slug)}">\n${rendered}\n</section>\n`;
+      }
+    }
+
+    const pageTitle =
+      page.meta && typeof page.meta === 'object' && 'title' in page.meta
+        ? String(page.meta.title)
+        : page.title;
+
+    return this.buildDocument(pageTitle, site.name, theme, contentHtml, siteId);
+  }
+
+  private async buildDocument(
     title: string,
     siteName: string,
     theme: SiteTheme | null,
     contentHtml: string,
     siteId: string,
-  ): string {
+  ): Promise<string> {
     const styles = this.buildThemeStyles(theme);
+    const navHtml = await this.buildNavigation(siteId);
 
     return (
       '<!DOCTYPE html>\n' +
@@ -200,6 +264,7 @@ export class SiteServeService {
       '  <header>\n' +
       '    <nav>\n' +
       `      <a href="/s/${this.escapeHtml(siteId)}" class="site-title">${this.escapeHtml(siteName)}</a>\n` +
+      `${navHtml}` +
       '    </nav>\n' +
       '  </header>\n' +
       '  <main>\n' +
@@ -208,6 +273,22 @@ export class SiteServeService {
       '</body>\n' +
       '</html>\n'
     );
+  }
+
+  private async buildNavigation(siteId: string): Promise<string> {
+    const items = await this.em.find(
+      MenuItem,
+      { site: { id: siteId }, menuName: 'header', parent: null },
+      { orderBy: { sortOrder: 'ASC' } },
+    );
+
+    if (items.length === 0) return '';
+
+    let html = '';
+    for (const item of items) {
+      html += `      <a href="${this.escapeHtml(item.url)}">${this.escapeHtml(item.label)}</a>\n`;
+    }
+    return html;
   }
 
   private buildThemeStyles(theme: SiteTheme | null): string {

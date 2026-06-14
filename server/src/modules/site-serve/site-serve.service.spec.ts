@@ -10,7 +10,7 @@ import { ThemeComponent, ComponentCategory } from '../themes/entities/theme-comp
 import { Collection } from '@mikro-orm/core';
 
 const mockEm = {
-  find: jest.fn(),
+  find: jest.fn().mockResolvedValue([]), // default: empty (for navigation queries)
   findOne: jest.fn(),
   count: jest.fn(),
 };
@@ -567,6 +567,178 @@ describe('SiteServeService', () => {
       const result = await service.renderEntryDetailPage('site-1', 'post', 'post');
 
       expect(result).toContain('direct value');
+    });
+  });
+
+  // ---------------------------------------------------------------------------
+  // renderBySlug
+  // ---------------------------------------------------------------------------
+
+  describe('renderBySlug', () => {
+    it('renders a page when a published page with the slug exists', async () => {
+      const pageComponent = makeComponent({
+        slug: 'hero',
+        template: '<section>{{heading}}</section>',
+        propsSchema: { heading: 'title' },
+      });
+      const page = {
+        id: 'page-1',
+        title: 'About Us',
+        slug: 'about',
+        isHomepage: false,
+        meta: {},
+        status: 'published',
+        site: { id: 'site-1' },
+      };
+      const sections = [
+        {
+          id: 'sec-1',
+          component: pageComponent,
+          sortOrder: 0,
+          props: { title: 'About Our Company' },
+          page: { id: 'page-1' },
+        },
+      ];
+      mockSitesService.findOne.mockResolvedValueOnce(makeSite());
+      mockThemesService.getTheme.mockResolvedValueOnce(null);
+      mockEm.findOne.mockResolvedValueOnce(page); // page lookup
+      mockEm.find.mockResolvedValueOnce(sections); // sections lookup
+
+      const result = await service.renderBySlug('site-1', 'about');
+
+      expect(result).toContain('About Our Company');
+      expect(result).toContain('data-component="hero"');
+    });
+
+    it('falls back to content type entry listing when no page matches', async () => {
+      mockEm.findOne
+        .mockResolvedValueOnce(null) // page lookup — no match
+        .mockResolvedValueOnce(null); // content type lookup — also no match, throws
+      mockSitesService.findOne.mockResolvedValueOnce(makeSite());
+      mockThemesService.getTheme.mockResolvedValueOnce(null);
+
+      await expect(service.renderBySlug('site-1', 'blog')).rejects.toThrow(NotFoundException);
+    });
+
+    it('renders sections in sort order', async () => {
+      const comp1 = makeComponent({
+        slug: 'hero',
+        template: '<div>{{text}}</div>',
+        propsSchema: { text: 'content' },
+      });
+      const comp2 = makeComponent({
+        slug: 'footer',
+        template: '<footer>{{text}}</footer>',
+        propsSchema: { text: 'content' },
+      });
+      const page = {
+        id: 'page-1',
+        title: 'Home',
+        slug: 'home',
+        isHomepage: true,
+        meta: {},
+        status: 'published',
+        site: { id: 'site-1' },
+      };
+      const sections = [
+        {
+          id: 'sec-1',
+          component: comp1,
+          sortOrder: 0,
+          props: { content: 'First' },
+          page: { id: 'page-1' },
+        },
+        {
+          id: 'sec-2',
+          component: comp2,
+          sortOrder: 1,
+          props: { content: 'Second' },
+          page: { id: 'page-1' },
+        },
+      ];
+      mockSitesService.findOne.mockResolvedValueOnce(makeSite());
+      mockThemesService.getTheme.mockResolvedValueOnce(null);
+      mockEm.findOne.mockResolvedValueOnce(page);
+      mockEm.find.mockResolvedValueOnce(sections);
+
+      const result = await service.renderBySlug('site-1', 'home');
+
+      const firstPos = result.indexOf('First');
+      const secondPos = result.indexOf('Second');
+      expect(firstPos).toBeLessThan(secondPos);
+    });
+
+    it('shows placeholder message for pages with no sections', async () => {
+      const page = {
+        id: 'page-1',
+        title: 'Empty',
+        slug: 'empty',
+        isHomepage: false,
+        meta: {},
+        status: 'published',
+        site: { id: 'site-1' },
+      };
+      mockSitesService.findOne.mockResolvedValueOnce(makeSite());
+      mockThemesService.getTheme.mockResolvedValueOnce(null);
+      mockEm.findOne.mockResolvedValueOnce(page);
+      mockEm.find.mockResolvedValueOnce([]);
+
+      const result = await service.renderBySlug('site-1', 'empty');
+
+      expect(result).toContain('no sections');
+    });
+  });
+
+  // ---------------------------------------------------------------------------
+  // renderHomePage (with homepage page support)
+  // ---------------------------------------------------------------------------
+
+  describe('renderHomePage with homepage pages', () => {
+    it('renders homepage page when a published homepage exists', async () => {
+      const comp = makeComponent({
+        slug: 'hero',
+        template: '<h1>{{greeting}}</h1>',
+        propsSchema: { greeting: 'message' },
+      });
+      const page = {
+        id: 'home-page',
+        title: 'Welcome',
+        slug: 'home',
+        isHomepage: true,
+        meta: { title: 'Custom Home Title' },
+        status: 'published',
+        site: { id: 'site-1' },
+      };
+      const sections = [
+        {
+          id: 'sec-1',
+          component: comp,
+          sortOrder: 0,
+          props: { message: 'Hello!' },
+          page: { id: 'home-page' },
+        },
+      ];
+      mockEm.findOne.mockResolvedValueOnce(page); // homepage lookup
+      mockSitesService.findOne.mockResolvedValueOnce(makeSite());
+      mockThemesService.getTheme.mockResolvedValueOnce(null);
+      mockEm.find.mockResolvedValueOnce(sections);
+
+      const result = await service.renderHomePage('site-1');
+
+      expect(result).toContain('Hello!');
+      expect(result).toContain('Custom Home Title');
+    });
+
+    it('falls back to content type listing when no homepage exists', async () => {
+      mockEm.findOne.mockResolvedValueOnce(null); // no homepage
+      mockSitesService.findOne.mockResolvedValueOnce(makeSite());
+      mockThemesService.getTheme.mockResolvedValueOnce(null);
+      mockEm.find.mockResolvedValueOnce([]); // no content types
+
+      const result = await service.renderHomePage('site-1');
+
+      expect(result).toContain('Content Types');
+      expect(result).toContain('No content types');
     });
   });
 });

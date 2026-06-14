@@ -8,6 +8,8 @@ import { ContentTypesService } from '../content-types/content-types.service.js';
 import { ContentEntriesService } from '../content-entries/content-entries.service.js';
 import { MediaReferencesService } from '../media-references/media-references.service.js';
 import { ThemesService } from '../themes/themes.service.js';
+import { PagesService } from '../pages/pages.service.js';
+import { NavigationService } from '../navigation/navigation.service.js';
 import { ContentStatus } from '../content-entries/entities/content-entry.entity.js';
 
 // ---------------------------------------------------------------------------
@@ -117,6 +119,30 @@ const mockThemesService = {
   updateTheme: jest.fn(),
 };
 
+const mockPagesService = {
+  create: jest.fn(),
+  findOne: jest.fn(),
+  findAll: jest.fn(),
+  update: jest.fn(),
+  remove: jest.fn(),
+  publish: jest.fn(),
+  unpublish: jest.fn(),
+  addSection: jest.fn(),
+  updateSection: jest.fn(),
+  removeSection: jest.fn(),
+  reorderSections: jest.fn(),
+  findBySlug: jest.fn(),
+  findHomepage: jest.fn(),
+};
+
+const mockNavigationService = {
+  create: jest.fn(),
+  findAll: jest.fn(),
+  update: jest.fn(),
+  remove: jest.fn(),
+  reorder: jest.fn(),
+};
+
 // ---------------------------------------------------------------------------
 // Test fixtures
 // ---------------------------------------------------------------------------
@@ -169,6 +195,8 @@ describe('McpService', () => {
         { provide: ContentEntriesService, useValue: mockContentEntriesService },
         { provide: MediaReferencesService, useValue: mockMediaReferencesService },
         { provide: ThemesService, useValue: mockThemesService },
+        { provide: PagesService, useValue: mockPagesService },
+        { provide: NavigationService, useValue: mockNavigationService },
       ],
     }).compile();
 
