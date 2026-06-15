@@ -345,7 +345,7 @@ The same NestJS server exposes a REST API used by the dashboard and available to
 | --------------------------------------------- | ----------- |
 | Server bootstrap and health checks            | ✅ Complete |
 | MCP SSE/HTTP transport                        | ✅ Complete |
-| MCP Tools (19 tools)                          | ✅ Complete |
+| MCP Tools (40 tools)                          | ✅ Complete |
 | MCP Resources (4 resources)                   | ✅ Complete |
 | MCP Prompts (3 prompts)                       | ✅ Complete |
 | Content REST API                              | ✅ Complete |
@@ -358,6 +358,7 @@ The same NestJS server exposes a REST API used by the dashboard and available to
 | Human review queue (Dashboard)                | ✅ Complete |
 | Activity feed (Dashboard)                     | ✅ Complete |
 | Content browser (Dashboard)                   | ✅ Complete |
+| Assets media browser (Dashboard)              | ✅ Complete |
 | API key management (Dashboard)                | ✅ Complete |
 | Theme management (Dashboard)                  | ✅ Complete |
 | Design token editor (Dashboard)               | ✅ Complete |
@@ -367,6 +368,12 @@ The same NestJS server exposes a REST API used by the dashboard and available to
 | Design system (tokens, components, Storybook) | ✅ Complete |
 | Public API (unauthenticated content delivery) | ✅ Complete |
 | Site Serving (server-side rendered pages)     | ✅ Complete |
+| Pages with multi-section composition          | ✅ Complete |
+| Navigation / menus (header, footer)           | ✅ Complete |
+| File upload + static asset serving            | ✅ Complete |
+| Image optimization (WebP variants via sharp)  | ✅ Complete |
+| Font auto-download + GDPR-safe local serving  | ✅ Complete |
+| Favicon support                               | ✅ Complete |
 | Docker Compose + setup script                 | ✅ Complete |
 
 ---
@@ -375,11 +382,11 @@ The same NestJS server exposes a REST API used by the dashboard and available to
 
 | Capability                            | Notes                                                                         |
 | ------------------------------------- | ----------------------------------------------------------------------------- |
+| Webhook system                        | No outbound webhooks for content events                                       |
+| Content versioning / rollback         | No revision history                                                           |
 | Role-based access control enforcement | Roles exist in JWT but are not checked by endpoint guards                     |
 | User registration endpoint            | RegisterDto exists but no controller route                                    |
 | User management CRUD                  | No list/update/delete user endpoints                                          |
-| File/image upload                     | Media references are URL-based only                                           |
-| Webhook system                        | No outbound webhooks for content events                                       |
 | Full-text search                      | No search indexing on content                                                 |
 | API versioning                        | No versioning strategy in place                                               |
 | WordPress migration tool              | Platform type exists but no import tooling                                    |

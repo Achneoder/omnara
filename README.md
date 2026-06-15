@@ -52,7 +52,7 @@ The **Dashboard** is for humans. It shows AI activity in real time, surfaces con
 
 ### AI-Native Content Management
 
-- **19 MCP Tools** — AI agents can list, create, update, delete, publish, and unpublish content; attach media; manage themes and components; all through natural language
+- **40 MCP Tools** — AI agents can create sites, define content types, manage entries, compose pages with multiple components, set up navigation, upload assets, and manage themes — all through natural language
 - **4 MCP Resources** — agents read site schema, content type definitions, and theme documents to understand the data model before acting
 - **3 MCP Prompts** — guided workflows for common tasks: creating blog posts, updating product descriptions, and reviewing/publishing content
 - Connect any MCP-compatible agent, including Claude.ai (Pro, Max, and Teams plans)
@@ -102,6 +102,26 @@ The **Dashboard** is for humans. It shows AI activity in real time, surfaces con
 - Component template rendering with `{{placeholder}}` syntax and semantic field fallback
 - Public routes at `/s/:siteId/...` — home pages, content type listings, and entry detail pages
 - No authentication required — built for end-user traffic
+
+### Pages & Navigation
+
+- **Pages** — first-class entities that compose multiple theme components into a single URL
+- **Page sections** — ordered component instances with inline props data
+- **Multi-section rendering** — hero + cards + CTA on one page, each rendered from a theme component
+- **Homepage** — set any published page as the site homepage
+- **Navigation menus** — header, footer, and custom menus with self-referencing nested items
+- **MCP tools** — 11 page tools + 5 menu tools for complete agent-driven site building
+
+### Asset Management
+
+- **File upload** — multipart upload with 10 MB limit, JWT-protected
+- **Image optimization** — automatic WebP variants (thumb, sm, md, lg) via sharp on upload
+- **Storage abstraction** — `AssetStorage` interface, local disk by default, swappable to S3
+- **Static serving** — `GET /assets/:siteId/:assetId/:filename` with immutable caching
+- **Font auto-download** — remote font URLs in theme CSS downloaded and served locally (GDPR-safe)
+- **Favicon support** — upload a favicon, auto-injected as `<link rel="icon">` in every page
+- **Dashboard media browser** — grid view with thumbnails, upload, filter, delete, copy URL
+- **MCP tools** — `upload_asset`, `list_assets`, `delete_asset`
 
 ### Headless Public API
 
