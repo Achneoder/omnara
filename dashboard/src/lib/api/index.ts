@@ -159,14 +159,14 @@ export const api = {
   },
 
   apiKeys: {
+    listAll: () => request<ApiKey[]>('/api-keys'),
     list: (siteId: string) => request<ApiKey[]>(`/sites/${siteId}/api-keys`),
     create: (siteId: string, dto: CreateApiKeyDto) =>
       request<ApiKeyCreated>(`/sites/${siteId}/api-keys`, {
         method: 'POST',
         body: JSON.stringify(dto),
       }),
-    revoke: (siteId: string, keyId: string) =>
-      request<void>(`/sites/${siteId}/api-keys/${keyId}`, { method: 'DELETE' }),
+    revoke: (keyId: string) => request<void>(`/api-keys/${keyId}`, { method: 'DELETE' }),
   },
 
   contentTypes: {

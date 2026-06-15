@@ -39,6 +39,23 @@ export class ApiKeysService {
     };
   }
 
+  async findAll(): Promise<ApiKeyResponseDto[]> {
+    const keys = await this.em.find(
+      ApiKey,
+      {},
+      { populate: ['site'], orderBy: { createdAt: 'DESC' } },
+    );
+
+    return keys.map((key) => ({
+      id: key.id,
+      label: key.label,
+      siteId: (key.site as Site).id,
+      lastUsedAt: key.lastUsedAt,
+      revokedAt: key.revokedAt,
+      createdAt: key.createdAt,
+    }));
+  }
+
   async findBySite(siteId: string): Promise<ApiKeyResponseDto[]> {
     const keys = await this.em.find(ApiKey, {
       site: { id: siteId },

@@ -17,6 +17,7 @@ export interface Site {
 export interface ApiKey {
   id: string;
   label: string;
+  siteId: string;
   lastUsedAt: string | null;
   revokedAt: string | null;
   createdAt: string;
