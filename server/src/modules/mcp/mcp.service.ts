@@ -84,7 +84,7 @@ export class McpService implements OnApplicationShutdown {
       'list_sites',
       {
         description:
-          'Lists all CMS sites managed by this omnara instance. Returns an array of site objects each containing id, name, url, platform (wordpress|shopify|custom), and settings. Call this first to discover available site IDs before performing any site-scoped operations.',
+          'Lists all CMS sites managed by this omnara instance. Returns an array of site objects each containing id, name, url, platform (wordpress|shopify|custom), domain (custom hostname, if set), and settings. Call this first to discover available site IDs before performing any site-scoped operations.',
       },
       async () => {
         try {
@@ -95,6 +95,7 @@ export class McpService implements OnApplicationShutdown {
               name: s.name,
               url: s.url,
               platform: s.platform,
+              domain: s.domain,
               settings: s.settings,
             })),
           );
@@ -115,18 +116,25 @@ export class McpService implements OnApplicationShutdown {
           platform: z
             .enum([SitePlatform.WORDPRESS, SitePlatform.SHOPIFY, SitePlatform.CUSTOM])
             .describe('Platform type: wordpress, shopify, or custom'),
+          domain: z
+            .string()
+            .optional()
+            .describe(
+              'Custom hostname mapped to this site for domain-based serving (e.g. "myblog.com" or "shop.example.com"). Must not include protocol or trailing slash. Must be globally unique across all sites.',
+            ),
           settings: z
             .record(z.unknown())
             .optional()
             .describe('Arbitrary site settings as a JSON object'),
         },
       },
-      async ({ name, url, platform, settings }) => {
+      async ({ name, url, platform, domain, settings }) => {
         try {
           const site = await this.sitesService.create({
             name,
             url,
             platform: platform as SitePlatform,
+            domain,
             settings: settings as Record<string, unknown> | undefined,
           });
           return ok(site);
@@ -149,18 +157,25 @@ export class McpService implements OnApplicationShutdown {
             .enum([SitePlatform.WORDPRESS, SitePlatform.SHOPIFY, SitePlatform.CUSTOM])
             .optional()
             .describe('New platform type'),
+          domain: z
+            .string()
+            .optional()
+            .describe(
+              'Custom hostname for domain-based serving (e.g. "myblog.com"). Must not include protocol or trailing slash. Must be globally unique across all sites.',
+            ),
           settings: z
             .record(z.unknown())
             .optional()
             .describe('New settings object (replaces existing)'),
         },
       },
-      async ({ site_id, name, url, platform, settings }) => {
+      async ({ site_id, name, url, platform, domain, settings }) => {
         try {
           const site = await this.sitesService.update(site_id, {
             name,
             url,
             platform: platform as SitePlatform | undefined,
+            domain,
             settings: settings as Record<string, unknown> | undefined,
           });
           return ok(site);
@@ -1502,6 +1517,7 @@ export class McpService implements OnApplicationShutdown {
               name: site.name,
               url: site.url,
               platform: site.platform,
+              domain: site.domain,
               contentTypes: contentTypes.map((ct) => ({
                 id: ct.id,
                 name: ct.name,

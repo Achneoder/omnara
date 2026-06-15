@@ -25,6 +25,9 @@ export class SitesService {
     site.name = dto.name;
     site.url = dto.url;
     site.platform = dto.platform;
+    if (dto.domain !== undefined) {
+      site.domain = dto.domain;
+    }
     if (dto.settings !== undefined) {
       site.settings = dto.settings;
     }
@@ -38,6 +41,7 @@ export class SitesService {
     if (dto.name !== undefined) site.name = dto.name;
     if (dto.url !== undefined) site.url = dto.url;
     if (dto.platform !== undefined) site.platform = dto.platform;
+    if (dto.domain !== undefined) site.domain = dto.domain;
     if (dto.settings !== undefined) site.settings = dto.settings;
     await this.em.flush();
     return site;

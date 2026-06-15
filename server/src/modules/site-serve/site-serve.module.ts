@@ -1,6 +1,8 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule, RequestMethod } from '@nestjs/common';
 import { SiteServeController } from './site-serve.controller.js';
 import { SiteServeService } from './site-serve.service.js';
+import { DomainServeController } from './domain-serve.controller.js';
+import { SiteDomainMiddleware } from './site-domain.middleware.js';
 import { ThemesModule } from '../themes/themes.module.js';
 import { SitesModule } from '../sites/sites.module.js';
 import { ContentTypesModule } from '../content-types/content-types.module.js';
@@ -19,7 +21,11 @@ import { AssetsModule } from '../assets/assets.module.js';
     NavigationModule,
     AssetsModule,
   ],
-  controllers: [SiteServeController],
-  providers: [SiteServeService],
+  controllers: [SiteServeController, DomainServeController],
+  providers: [SiteServeService, SiteDomainMiddleware],
 })
-export class SiteServeModule {}
+export class SiteServeModule implements NestModule {
+  configure(consumer: MiddlewareConsumer): void {
+    consumer.apply(SiteDomainMiddleware).forRoutes({ path: '*', method: RequestMethod.GET });
+  }
+}
