@@ -1,6 +1,5 @@
-import { Entity, PrimaryKey, Property, ManyToOne, Index } from '@mikro-orm/decorators/legacy';
+import { Entity, PrimaryKey, Property } from '@mikro-orm/decorators/legacy';
 import { v4 as uuidv4 } from 'uuid';
-import { Site } from '../../sites/entities/site.entity.js';
 
 @Entity({ tableName: 'api_keys' })
 export class ApiKey {
@@ -12,10 +11,6 @@ export class ApiKey {
 
   @Property()
   label!: string;
-
-  @ManyToOne(() => Site, { fieldName: 'site_id', deleteRule: 'cascade' })
-  @Index()
-  site!: Site;
 
   @Property({ nullable: true, type: 'timestamptz' })
   lastUsedAt: Date | null = null;

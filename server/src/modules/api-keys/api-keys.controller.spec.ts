@@ -7,7 +7,7 @@ import { ApiKeyResponseDto } from './dto/api-key-response.dto.js';
 import { CreateApiKeyDto } from './dto/create-api-key.dto.js';
 
 const mockApiKeysService = {
-  findBySite: jest.fn(),
+  findAll: jest.fn(),
   generate: jest.fn(),
   revoke: jest.fn(),
 };
@@ -29,57 +29,44 @@ describe('ApiKeysController', () => {
     controller = module.get<ApiKeysController>(ApiKeysController);
   });
 
-  describe('findBySite', () => {
-    it('returns list of non-revoked keys for the site', async () => {
+  describe('findAll', () => {
+    it('returns list of all API keys', async () => {
       const keys: ApiKeyResponseDto[] = [
         {
           id: 'key-1',
           label: 'Production Key',
-          siteId: 'site-1',
           lastUsedAt: null,
           revokedAt: null,
           createdAt: new Date('2024-01-01'),
         },
       ];
-      mockApiKeysService.findBySite.mockResolvedValueOnce(keys);
+      mockApiKeysService.findAll.mockResolvedValueOnce(keys);
 
-      const result = await controller.findBySite('site-1');
+      const result = await controller.findAll();
 
-      expect(mockApiKeysService.findBySite).toHaveBeenCalledWith('site-1');
+      expect(mockApiKeysService.findAll).toHaveBeenCalled();
       expect(result).toBe(keys);
     });
   });
 
   describe('generate', () => {
-    it('passes merged dto to service and returns response with plaintext key', async () => {
-      const dto: CreateApiKeyDto = { label: 'New Key', siteId: 'site-1' };
+    it('passes dto to service and returns response with key', async () => {
+      const dto: CreateApiKeyDto = { label: 'New Key' };
       const response: ApiKeyResponseDto = {
         id: 'key-new',
         label: 'New Key',
-        siteId: 'site-1',
         lastUsedAt: null,
         revokedAt: null,
         createdAt: new Date(),
-        plainTextKey: 'omk_abc123',
+        key: 'omk_abc123',
       };
       mockApiKeysService.generate.mockResolvedValueOnce(response);
 
-      const result = await controller.generate('site-1', dto);
+      const result = await controller.generate(dto);
 
-      expect(mockApiKeysService.generate).toHaveBeenCalledWith({
-        label: 'New Key',
-        siteId: 'site-1',
-      });
+      expect(mockApiKeysService.generate).toHaveBeenCalledWith({ label: 'New Key' });
       expect(result).toBe(response);
-      expect(result.plainTextKey).toBe('omk_abc123');
-    });
-
-    it('propagates NotFoundException when site not found', async () => {
-      mockApiKeysService.generate.mockRejectedValueOnce(new NotFoundException());
-
-      await expect(
-        controller.generate('missing-site', { label: 'Key', siteId: 'missing-site' }),
-      ).rejects.toThrow(NotFoundException);
+      expect(result.key).toBe('omk_abc123');
     });
   });
 

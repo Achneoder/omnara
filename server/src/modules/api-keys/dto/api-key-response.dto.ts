@@ -1,7 +1,6 @@
 export class ApiKeyResponseDto {
   id!: string;
   label!: string;
-  siteId!: string;
   lastUsedAt!: Date | null;
   revokedAt!: Date | null;
   createdAt!: Date;

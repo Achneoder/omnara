@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { api } from '$lib/api';
-  import type { ApiKey, ApiKeyCreated, Site } from '$lib/types';
+  import type { ApiKey, ApiKeyCreated } from '$lib/types';
   import Button from '$lib/components/Button.svelte';
   import Modal from '$lib/components/Modal.svelte';
   import FormField from '$lib/components/FormField.svelte';
@@ -11,13 +11,11 @@
   import Badge from '$lib/components/Badge.svelte';
 
   let keys = $state<ApiKey[]>([]);
-  let sites = $state<Site[]>([]);
   let loading = $state(true);
   let error = $state('');
 
   let showCreateModal = $state(false);
   let newLabel = $state('');
-  let newSiteId = $state('');
   let creating = $state(false);
   let createError = $state('');
 
@@ -28,7 +26,7 @@
     loading = true;
     error = '';
     try {
-      [keys, sites] = await Promise.all([api.apiKeys.listAll(), api.sites.list()]);
+      keys = await api.apiKeys.list();
     } catch (err) {
       error = err instanceof Error ? err.message : 'Failed to load API keys.';
     } finally {
@@ -36,21 +34,16 @@
     }
   }
 
-  function siteName(siteId: string): string {
-    return sites.find((s) => s.id === siteId)?.name ?? siteId;
-  }
-
   async function handleCreate(e: SubmitEvent) {
     e.preventDefault();
     creating = true;
     createError = '';
     try {
-      const result = await api.apiKeys.create(newSiteId, { label: newLabel });
+      const result = await api.apiKeys.create({ label: newLabel });
       createdKey = result;
       keys = [...keys, result];
       showCreateModal = false;
       newLabel = '';
-      newSiteId = '';
     } catch (err) {
       createError = err instanceof Error ? err.message : 'Failed to create API key.';
     } finally {
@@ -87,10 +80,11 @@
     <div>
       <h1 class="text-2xl font-bold text-gray-900">API Keys</h1>
       <p class="mt-1 text-sm text-gray-500">
-        Manage API keys for agent access. Each key is associated with a site for MCP context.
+        Manage API keys for agent access. Keys are global and can be used to manage any site or
+        create new ones.
       </p>
     </div>
-    <Button onclick={() => (showCreateModal = true)} disabled={sites.length === 0}>
+    <Button onclick={() => (showCreateModal = true)}>
       <svg
         xmlns="http://www.w3.org/2000/svg"
         class="h-4 w-4"
@@ -119,21 +113,18 @@
   {:else if keys.length === 0}
     <EmptyState
       title="No API keys"
-      description="Generate an API key for an agent to authenticate with a site."
+      description="Generate an API key to allow agents to authenticate with omnara."
     >
       {#snippet action()}
-        <Button onclick={() => (showCreateModal = true)} disabled={sites.length === 0}>
-          Generate key
-        </Button>
+        <Button onclick={() => (showCreateModal = true)}>Generate key</Button>
       {/snippet}
     </EmptyState>
   {:else}
-    <div class="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden">
+    <div class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
       <table class="w-full text-sm">
         <thead class="border-b border-gray-200 bg-gray-50">
           <tr>
             <th class="px-4 py-3 text-left font-medium text-gray-600">Label</th>
-            <th class="px-4 py-3 text-left font-medium text-gray-600">Site</th>
             <th class="px-4 py-3 text-left font-medium text-gray-600">Last used</th>
             <th class="px-4 py-3 text-left font-medium text-gray-600">Created</th>
             <th class="px-4 py-3 text-left font-medium text-gray-600">Status</th>
@@ -144,7 +135,6 @@
           {#each keys as key}
             <tr class="hover:bg-gray-50">
               <td class="px-4 py-3 font-medium text-gray-900">{key.label}</td>
-              <td class="px-4 py-3 text-gray-500">{siteName(key.siteId)}</td>
               <td class="px-4 py-3 text-gray-500">
                 {key.lastUsedAt ? new Date(key.lastUsedAt).toLocaleDateString() : 'Never'}
               </td>
@@ -180,7 +170,6 @@
     showCreateModal = false;
     createError = '';
     newLabel = '';
-    newSiteId = '';
   }}
 >
   <form onsubmit={handleCreate} id="create-key-form" class="flex flex-col gap-4">
@@ -196,19 +185,6 @@
         placeholder="Production agent"
         class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm shadow-sm placeholder:text-gray-400 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
       />
-    </FormField>
-    <FormField label="Site" id="key-site" required>
-      <select
-        id="key-site"
-        bind:value={newSiteId}
-        required
-        class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
-      >
-        <option value="" disabled>Select a site</option>
-        {#each sites as site}
-          <option value={site.id}>{site.name}</option>
-        {/each}
-      </select>
     </FormField>
   </form>
 
