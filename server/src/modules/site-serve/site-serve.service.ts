@@ -360,7 +360,9 @@ export class SiteServeService {
     return template.replace(/\{\{(\w+)\}\}/g, (_, placeholder: string) => {
       const bodyKey = propsSchema[placeholder] ?? placeholder;
       const raw = String(body[bodyKey] ?? '');
-      return this.escapeHtml(raw);
+      // Props whose key ends with _html contain trusted markup — insert verbatim.
+      // All other props are treated as plain text and escaped.
+      return placeholder.endsWith('_html') ? raw : this.escapeHtml(raw);
     });
   }
 

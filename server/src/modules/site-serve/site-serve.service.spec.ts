@@ -428,6 +428,58 @@ describe('SiteServeService', () => {
       expect(result).toContain('&lt;script&gt;alert');
     });
 
+    it('renders _html props as raw markup without escaping', async () => {
+      const component = makeComponent({
+        slug: 'hero',
+        template: '<section>{{headline}}<div class="logo">{{logo_html}}</div></section>',
+        propsSchema: { headline: 'headline', logo_html: 'logo_html' },
+      });
+      const ct = makeContentType({ name: 'Page', slug: 'page', component });
+      const entry = makeEntry({
+        title: 'Home',
+        slug: 'home',
+        body: {
+          headline: 'Welcome',
+          logo_html: '<img src="/assets/logo.png" alt="Logo" class="hero__logo" />',
+        },
+        contentType: ct,
+      });
+      mockSitesService.findOne.mockResolvedValueOnce(makeSite());
+      mockThemesService.getTheme.mockResolvedValueOnce(null);
+      mockEm.findOne.mockResolvedValueOnce(ct).mockResolvedValueOnce(entry);
+
+      const result = await service.renderEntryDetailPage('site-1', 'page', 'home');
+
+      expect(result).toContain('<img src="/assets/logo.png" alt="Logo" class="hero__logo" />');
+      expect(result).not.toContain('&lt;img');
+    });
+
+    it('still escapes plain text props even when other props end in _html', async () => {
+      const component = makeComponent({
+        slug: 'hero',
+        template: '<section>{{headline}}{{logo_html}}</section>',
+        propsSchema: { headline: 'headline', logo_html: 'logo_html' },
+      });
+      const ct = makeContentType({ name: 'Page', slug: 'page', component });
+      const entry = makeEntry({
+        title: 'XSS',
+        slug: 'xss',
+        body: {
+          headline: '<script>evil()</script>',
+          logo_html: '<img src="/logo.png" alt="Logo" />',
+        },
+        contentType: ct,
+      });
+      mockSitesService.findOne.mockResolvedValueOnce(makeSite());
+      mockThemesService.getTheme.mockResolvedValueOnce(null);
+      mockEm.findOne.mockResolvedValueOnce(ct).mockResolvedValueOnce(entry);
+
+      const result = await service.renderEntryDetailPage('site-1', 'page', 'xss');
+
+      expect(result).toContain('&lt;script&gt;evil()&lt;/script&gt;');
+      expect(result).toContain('<img src="/logo.png" alt="Logo" />');
+    });
+
     it('falls back to semantic field rendering when no component is assigned', async () => {
       const ct = makeContentType({
         name: 'Blog',
