@@ -14,7 +14,7 @@ import {
 import { SkipThrottle } from '@nestjs/throttler';
 import type { Request, Response } from 'express';
 import { SSEServerTransport } from '@modelcontextprotocol/sdk/server/sse.js';
-import { ApiKeyGuard, type AuthenticatedRequest } from '../../common/guards/api-key.guard.js';
+import { ApiKeyGuard } from '../../common/guards/api-key.guard.js';
 import { McpService } from './mcp.service.js';
 
 @Controller('mcp')
@@ -26,8 +26,7 @@ export class McpController {
   @SkipThrottle()
   async handleSse(@Req() req: Request, @Res() res: Response): Promise<void> {
     const transport = new SSEServerTransport('/mcp/messages', res);
-    const site = (req as Partial<AuthenticatedRequest>).apiKey?.site;
-    const server = this.mcpService.createServer(site);
+    const server = this.mcpService.createServer();
 
     this.mcpService.trackSession(transport.sessionId, server, transport);
 

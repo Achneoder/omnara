@@ -3,7 +3,6 @@ import { EntityManager } from '@mikro-orm/postgresql';
 import * as argon2 from 'argon2';
 import { randomBytes } from 'node:crypto';
 import { ApiKey } from './entities/api-key.entity.js';
-import { Site } from '../sites/entities/site.entity.js';
 import { CreateApiKeyDto } from './dto/create-api-key.dto.js';
 import { ApiKeyResponseDto } from './dto/api-key-response.dto.js';
 
@@ -11,18 +10,12 @@ import { ApiKeyResponseDto } from './dto/api-key-response.dto.js';
 export class ApiKeysService {
   constructor(private readonly em: EntityManager) {}
 
-  async generate(siteId: string, dto: CreateApiKeyDto): Promise<ApiKeyResponseDto> {
-    const site = await this.em.findOne(Site, { id: siteId });
-    if (!site) {
-      throw new NotFoundException(`Site ${siteId} not found`);
-    }
-
+  async generate(dto: CreateApiKeyDto): Promise<ApiKeyResponseDto> {
     const rawKey = `omk_${randomBytes(32).toString('hex')}`;
     const keyHash = await argon2.hash(rawKey);
 
     const apiKey = new ApiKey();
     apiKey.label = dto.label;
-    apiKey.site = site;
     apiKey.keyHash = keyHash;
 
     this.em.persist(apiKey);
@@ -31,7 +24,6 @@ export class ApiKeysService {
     return {
       id: apiKey.id,
       label: apiKey.label,
-      siteId: site.id,
       lastUsedAt: apiKey.lastUsedAt,
       revokedAt: apiKey.revokedAt,
       createdAt: apiKey.createdAt,
@@ -39,16 +31,12 @@ export class ApiKeysService {
     };
   }
 
-  async findBySite(siteId: string): Promise<ApiKeyResponseDto[]> {
-    const keys = await this.em.find(ApiKey, {
-      site: { id: siteId },
-      revokedAt: null,
-    });
+  async findAll(): Promise<ApiKeyResponseDto[]> {
+    const keys = await this.em.find(ApiKey, {}, { orderBy: { createdAt: 'DESC' } });
 
     return keys.map((key) => ({
       id: key.id,
       label: key.label,
-      siteId,
       lastUsedAt: key.lastUsedAt,
       revokedAt: key.revokedAt,
       createdAt: key.createdAt,
@@ -66,13 +54,10 @@ export class ApiKeysService {
 
   /**
    * Validates a raw API key against all non-revoked keys in the database.
-   * Returns the matching ApiKey entity (with site populated) or null if no match.
-   *
-   * Uses argon2 verification so this involves a hash comparison per key.
-   * Callers should update lastUsedAt on the returned key after a successful match.
+   * Returns the matching ApiKey entity or null if no match.
    */
   async validateKey(rawKey: string): Promise<ApiKey | null> {
-    const candidates = await this.em.find(ApiKey, { revokedAt: null }, { populate: ['site'] });
+    const candidates = await this.em.find(ApiKey, { revokedAt: null });
 
     for (const candidate of candidates) {
       const matches = await argon2.verify(candidate.keyHash, rawKey);

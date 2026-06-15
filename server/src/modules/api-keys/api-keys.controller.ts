@@ -14,22 +14,19 @@ import { ApiKeysService } from './api-keys.service.js';
 import { CreateApiKeyDto } from './dto/create-api-key.dto.js';
 import { ApiKeyResponseDto } from './dto/api-key-response.dto.js';
 
-@Controller('sites/:siteId/api-keys')
+@Controller('api-keys')
 @UseGuards(JwtAuthGuard)
 export class ApiKeysController {
   constructor(private readonly apiKeysService: ApiKeysService) {}
 
   @Get()
-  findBySite(@Param('siteId') siteId: string): Promise<ApiKeyResponseDto[]> {
-    return this.apiKeysService.findBySite(siteId);
+  findAll(): Promise<ApiKeyResponseDto[]> {
+    return this.apiKeysService.findAll();
   }
 
   @Post()
-  generate(
-    @Param('siteId') siteId: string,
-    @Body() dto: CreateApiKeyDto,
-  ): Promise<ApiKeyResponseDto> {
-    return this.apiKeysService.generate(siteId, dto);
+  generate(@Body() dto: CreateApiKeyDto): Promise<ApiKeyResponseDto> {
+    return this.apiKeysService.generate(dto);
   }
 
   @Delete(':keyId')
