@@ -18,7 +18,7 @@ export class MenuItem {
   url!: string;
 
   // Self-referencing: parent menu item for nested menus
-  @ManyToOne('MenuItem', {
+  @ManyToOne(() => MenuItem, {
     fieldName: 'parent_id',
     nullable: true,
     deleteRule: 'cascade',

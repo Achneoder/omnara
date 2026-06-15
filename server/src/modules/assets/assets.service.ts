@@ -6,6 +6,7 @@ import { Asset, AssetCategory } from './entities/asset.entity.js';
 import { AssetStorage } from './storage/asset-storage.interface.js';
 import { ImageProcessor } from './image-processor.js';
 import { ActivityLogService } from '../activity-log/activity-log.service.js';
+import { Site } from '../sites/entities/site.entity.js';
 
 const IMAGE_MIME_PREFIX = 'image/';
 const SVG_MIME = 'image/svg+xml';
@@ -32,7 +33,7 @@ export class AssetsService {
     const storagePath = await this.storage.store(buffer, siteId, safeName);
 
     const asset = new Asset();
-    asset.site = this.em.getReference('Site', siteId);
+    asset.site = this.em.getReference(Site, siteId);
     asset.originalName = originalName;
     asset.storagePath = storagePath;
     asset.mimeType = mimeType;

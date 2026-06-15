@@ -4,6 +4,7 @@ import { EntityManager } from '@mikro-orm/postgresql';
 import { Page, PageStatus } from './entities/page.entity.js';
 import { PageSection } from './entities/page-section.entity.js';
 import { ThemeComponent } from '../themes/entities/theme-component.entity.js';
+import { Site } from '../sites/entities/site.entity.js';
 import { ActivityLogService } from '../activity-log/activity-log.service.js';
 import { CreatePageDto } from './dto/create-page.dto.js';
 import { UpdatePageDto } from './dto/update-page.dto.js';
@@ -20,7 +21,7 @@ export class PagesService {
 
   async create(siteId: string, dto: CreatePageDto): Promise<Page> {
     const page = new Page();
-    page.site = this.em.getReference('Site', siteId);
+    page.site = this.em.getReference(Site, siteId);
     page.title = dto.title;
     page.slug = dto.slug;
     if (dto.isHomepage !== undefined) page.isHomepage = dto.isHomepage;

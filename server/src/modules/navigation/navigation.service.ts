@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { EntityManager } from '@mikro-orm/postgresql';
 import { MenuItem } from './entities/menu-item.entity.js';
+import { Site } from '../sites/entities/site.entity.js';
 import { ActivityLogService } from '../activity-log/activity-log.service.js';
 import { CreateMenuItemDto } from './dto/create-menu-item.dto.js';
 import { UpdateMenuItemDto } from './dto/update-menu-item.dto.js';
@@ -14,7 +15,7 @@ export class NavigationService {
 
   async create(siteId: string, dto: CreateMenuItemDto): Promise<MenuItem> {
     const item = new MenuItem();
-    item.site = this.em.getReference('Site', siteId);
+    item.site = this.em.getReference(Site, siteId);
     item.label = dto.label;
     item.url = dto.url;
     if (dto.parentId !== undefined) {
