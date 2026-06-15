@@ -1,5 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { NotFoundException } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { EntityManager } from '@mikro-orm/postgresql';
 import { PagesService } from './pages.service.js';
 import { Page, PageStatus } from './entities/page.entity.js';
@@ -29,6 +30,8 @@ const mockEm = {
 const mockActivityLogService = {
   log: jest.fn().mockResolvedValue(undefined),
 };
+
+const mockEventEmitter = { emit: jest.fn() };
 
 function defaultPage(): Record<string, unknown> {
   return {
@@ -65,6 +68,7 @@ describe('PagesService', () => {
         PagesService,
         { provide: EntityManager, useValue: mockEm },
         { provide: ActivityLogService, useValue: mockActivityLogService },
+        { provide: EventEmitter2, useValue: mockEventEmitter },
       ],
     }).compile();
 

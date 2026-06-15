@@ -11,6 +11,7 @@ import { ThemesModule } from '../themes/themes.module.js';
 import { PagesModule } from '../pages/pages.module.js';
 import { NavigationModule } from '../navigation/navigation.module.js';
 import { AssetsModule } from '../assets/assets.module.js';
+import { WebhooksModule } from '../webhooks/webhooks.module.js';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { AssetsModule } from '../assets/assets.module.js';
     PagesModule,
     NavigationModule,
     AssetsModule,
+    WebhooksModule,
   ],
   providers: [McpService, ApiKeyGuard],
   controllers: [McpController],

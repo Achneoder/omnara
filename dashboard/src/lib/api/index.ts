@@ -11,6 +11,9 @@ import type {
   SiteTheme,
   ThemeComponent,
   AssetDto,
+  Webhook,
+  WebhookCreated,
+  WebhookDelivery,
 } from '$lib/types';
 
 function getBaseUrl(): string {
@@ -262,5 +265,27 @@ export const api = {
     },
     delete: (siteId: string, id: string) =>
       request<void>(`/sites/${siteId}/assets/${id}`, { method: 'DELETE' }),
+  },
+
+  webhooks: {
+    list: (siteId: string) => request<Webhook[]>(`/sites/${siteId}/webhooks`),
+    create: (siteId: string, dto: { url: string; eventTypes: string[]; isActive?: boolean }) =>
+      request<WebhookCreated>(`/sites/${siteId}/webhooks`, {
+        method: 'POST',
+        body: JSON.stringify(dto),
+      }),
+    update: (
+      siteId: string,
+      id: string,
+      dto: { url?: string; eventTypes?: string[]; isActive?: boolean },
+    ) =>
+      request<Webhook>(`/sites/${siteId}/webhooks/${id}`, {
+        method: 'PATCH',
+        body: JSON.stringify(dto),
+      }),
+    delete: (siteId: string, id: string) =>
+      request<void>(`/sites/${siteId}/webhooks/${id}`, { method: 'DELETE' }),
+    listDeliveries: (siteId: string, webhookId: string) =>
+      request<WebhookDelivery[]>(`/sites/${siteId}/webhooks/${webhookId}/deliveries`),
   },
 };

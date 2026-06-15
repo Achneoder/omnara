@@ -1,4 +1,5 @@
 import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { EntityManager } from '@mikro-orm/postgresql';
 import { SiteTheme } from './entities/site-theme.entity.js';
 import { ThemeComponent } from './entities/theme-component.entity.js';
@@ -20,6 +21,7 @@ export class ThemesService {
     private readonly em: EntityManager,
     private readonly activityLogService: ActivityLogService,
     private readonly assetsService: AssetsService,
+    private readonly eventEmitter: EventEmitter2,
   ) {}
 
   async getTheme(siteId: string): Promise<SiteTheme | null> {
@@ -94,6 +96,12 @@ export class ThemesService {
       .catch(() => {
         // Intentionally swallowed — activity log failures must not surface to callers
       });
+
+    this.eventEmitter.emit('webhook.theme.imported', {
+      siteId,
+      event: 'theme.imported',
+      payload: { id: theme.id, name: theme.name, version: theme.version },
+    });
 
     // Re-fetch with components populated (transactional em is forked, use service em)
     const populated = await this.em.findOne(

@@ -11,6 +11,7 @@ import { ThemesService } from '../themes/themes.service.js';
 import { PagesService } from '../pages/pages.service.js';
 import { NavigationService } from '../navigation/navigation.service.js';
 import { AssetsService } from '../assets/assets.service.js';
+import { WebhooksService } from '../webhooks/webhooks.service.js';
 import { ContentStatus } from '../content-entries/entities/content-entry.entity.js';
 
 // ---------------------------------------------------------------------------
@@ -152,6 +153,12 @@ const mockAssetsService = {
   getAbsolutePath: jest.fn(),
 };
 
+const mockWebhooksService = {
+  findAll: jest.fn(),
+  create: jest.fn(),
+  remove: jest.fn(),
+};
+
 // ---------------------------------------------------------------------------
 // Test fixtures
 // ---------------------------------------------------------------------------
@@ -207,6 +214,7 @@ describe('McpService', () => {
         { provide: PagesService, useValue: mockPagesService },
         { provide: NavigationService, useValue: mockNavigationService },
         { provide: AssetsService, useValue: mockAssetsService },
+        { provide: WebhooksService, useValue: mockWebhooksService },
       ],
     }).compile();
 

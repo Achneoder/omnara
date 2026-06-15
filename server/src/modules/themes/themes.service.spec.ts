@@ -1,5 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { NotFoundException, BadRequestException } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { EntityManager } from '@mikro-orm/postgresql';
 import { ThemesService } from './themes.service.js';
 import { SiteTheme } from './entities/site-theme.entity.js';
@@ -29,6 +30,8 @@ const mockAssetsService = {
   findAll: jest.fn(),
 };
 
+const mockEventEmitter = { emit: jest.fn() };
+
 describe('ThemesService', () => {
   let service: ThemesService;
 
@@ -41,6 +44,7 @@ describe('ThemesService', () => {
         { provide: EntityManager, useValue: mockEntityManager },
         { provide: ActivityLogService, useValue: mockActivityLogService },
         { provide: AssetsService, useValue: mockAssetsService },
+        { provide: EventEmitter2, useValue: mockEventEmitter },
       ],
     }).compile();
 

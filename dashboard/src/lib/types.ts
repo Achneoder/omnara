@@ -91,3 +91,28 @@ export interface AssetDto {
   url: string;
   variants: Record<string, string>;
 }
+
+export interface Webhook {
+  id: string;
+  url: string;
+  eventTypes: string[];
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface WebhookCreated extends Webhook {
+  plaintextSecret: string;
+}
+
+export interface WebhookDelivery {
+  id: string;
+  event: string;
+  payload: Record<string, unknown>;
+  statusCode: number | null;
+  responseBody: string | null;
+  attempts: number;
+  success: boolean;
+  deliveredAt: string | null;
+  createdAt: string;
+}
