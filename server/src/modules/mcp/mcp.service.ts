@@ -10,6 +10,7 @@ import { ThemesService } from '../themes/themes.service.js';
 import { PagesService } from '../pages/pages.service.js';
 import { NavigationService } from '../navigation/navigation.service.js';
 import { AssetsService } from '../assets/assets.service.js';
+import { WebhooksService } from '../webhooks/webhooks.service.js';
 import { AssetCategory } from '../assets/entities/asset.entity.js';
 import { ComponentCategory } from '../themes/entities/theme-component.entity.js';
 import { ContentStatus } from '../content-entries/entities/content-entry.entity.js';
@@ -50,6 +51,7 @@ export class McpService implements OnApplicationShutdown {
     private readonly pagesService: PagesService,
     private readonly navigationService: NavigationService,
     private readonly assetsService: AssetsService,
+    private readonly webhooksService: WebhooksService,
   ) {}
 
   /**
@@ -1397,6 +1399,78 @@ export class McpService implements OnApplicationShutdown {
       async ({ site_id, asset_id }) => {
         try {
           await this.assetsService.remove(site_id, asset_id);
+          return ok({ deleted: true });
+        } catch (e) {
+          return err(e);
+        }
+      },
+    );
+
+    server.registerTool(
+      'create_webhook',
+      {
+        description:
+          'Registers a webhook endpoint for a site. The server will POST to the URL when the specified events occur. The response includes a one-time plaintext secret — store it securely and use it to verify the HMAC-SHA256 signature on incoming requests (header: X-Omnara-Signature). Supported events: entry.created, entry.updated, entry.published, entry.deleted, page.published, theme.imported.',
+        inputSchema: {
+          site_id: z.string().describe('UUID of the site'),
+          url: z.string().describe('HTTPS URL to receive webhook POST requests'),
+          event_types: z
+            .array(z.string())
+            .describe(
+              'List of event types to subscribe to (e.g. ["entry.published", "page.published"])',
+            ),
+          is_active: z
+            .boolean()
+            .optional()
+            .describe('Whether the webhook is active (default: true)'),
+        },
+      },
+      async ({ site_id, url, event_types, is_active }) => {
+        try {
+          const result = await this.webhooksService.create(site_id, {
+            url,
+            eventTypes: event_types,
+            isActive: is_active,
+          });
+          return ok(result);
+        } catch (e) {
+          return err(e);
+        }
+      },
+    );
+
+    server.registerTool(
+      'list_webhooks',
+      {
+        description:
+          'Returns all webhooks registered for a site, including their URL, subscribed event types, and active status.',
+        inputSchema: {
+          site_id: z.string().describe('UUID of the site'),
+        },
+      },
+      async ({ site_id }) => {
+        try {
+          const webhooks = await this.webhooksService.findAll(site_id);
+          return ok(webhooks);
+        } catch (e) {
+          return err(e);
+        }
+      },
+    );
+
+    server.registerTool(
+      'delete_webhook',
+      {
+        description:
+          'Permanently deletes a webhook and all its delivery history. Stops all future deliveries for this endpoint.',
+        inputSchema: {
+          site_id: z.string().describe('UUID of the site'),
+          webhook_id: z.string().describe('UUID of the webhook to delete'),
+        },
+      },
+      async ({ site_id, webhook_id }) => {
+        try {
+          await this.webhooksService.remove(webhook_id, site_id);
           return ok({ deleted: true });
         } catch (e) {
           return err(e);

@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
 import { ConfigModule } from '@nestjs/config';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { AppController } from './app.controller.js';
 import { AppService } from './app.service.js';
@@ -20,10 +21,12 @@ import { PagesModule } from './modules/pages/pages.module.js';
 import { PublicModule } from './modules/public/public.module.js';
 import { SiteServeModule } from './modules/site-serve/site-serve.module.js';
 import { ThemesModule } from './modules/themes/themes.module.js';
+import { WebhooksModule } from './modules/webhooks/webhooks.module.js';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
+    EventEmitterModule.forRoot({ wildcard: true }),
     ThrottlerModule.forRoot([{ ttl: 60000, limit: 100 }]),
     DatabaseModule,
     UsersModule,
@@ -41,6 +44,7 @@ import { ThemesModule } from './modules/themes/themes.module.js';
     PagesModule,
     SiteServeModule,
     ThemesModule,
+    WebhooksModule,
   ],
   controllers: [AppController],
   providers: [

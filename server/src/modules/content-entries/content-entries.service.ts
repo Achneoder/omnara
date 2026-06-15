@@ -1,4 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { EntityManager } from '@mikro-orm/postgresql';
 import { ContentEntry, ContentStatus } from './entities/content-entry.entity.js';
 import { ContentType } from '../content-types/entities/content-type.entity.js';
@@ -13,6 +14,7 @@ export class ContentEntriesService {
   constructor(
     private readonly em: EntityManager,
     private readonly activityLogService: ActivityLogService,
+    private readonly eventEmitter: EventEmitter2,
   ) {}
 
   async findAll(siteId: string, filters: ListEntriesDto): Promise<ContentEntry[]> {
@@ -84,6 +86,8 @@ export class ContentEntriesService {
       siteId,
     });
 
+    this.emitWebhookEvent('entry.created', siteId, entry);
+
     return entry;
   }
 
@@ -114,6 +118,8 @@ export class ContentEntriesService {
       siteId,
     });
 
+    this.emitWebhookEvent('entry.updated', siteId, entry);
+
     return entry;
   }
 
@@ -127,6 +133,8 @@ export class ContentEntriesService {
       entityId: id,
       siteId,
     });
+
+    this.emitWebhookEvent('entry.deleted', siteId, { id });
   }
 
   async publish(id: string, siteId: string): Promise<ContentEntry> {
@@ -140,6 +148,8 @@ export class ContentEntriesService {
       entityId: entry.id,
       siteId,
     });
+
+    this.emitWebhookEvent('entry.published', siteId, entry);
 
     return entry;
   }
@@ -171,5 +181,9 @@ export class ContentEntriesService {
       .catch(() => {
         // Intentionally swallowed — activity log failures must not surface to callers
       });
+  }
+
+  private emitWebhookEvent(event: string, siteId: string, payload: unknown): void {
+    this.eventEmitter.emit(`webhook.${event}`, { siteId, event, payload });
   }
 }

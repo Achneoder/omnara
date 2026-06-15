@@ -1,4 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { EntityManager } from '@mikro-orm/postgresql';
 import { Page, PageStatus } from './entities/page.entity.js';
 import { PageSection } from './entities/page-section.entity.js';
@@ -14,6 +15,7 @@ export class PagesService {
   constructor(
     private readonly em: EntityManager,
     private readonly activityLogService: ActivityLogService,
+    private readonly eventEmitter: EventEmitter2,
   ) {}
 
   async create(siteId: string, dto: CreatePageDto): Promise<Page> {
@@ -93,6 +95,11 @@ export class PagesService {
     await this.em.flush();
 
     this.logActivity({ action: 'page.published', entityId: page.id, siteId });
+    this.eventEmitter.emit('webhook.page.published', {
+      siteId,
+      event: 'page.published',
+      payload: page,
+    });
     return page;
   }
 
