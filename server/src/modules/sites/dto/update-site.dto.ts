@@ -1,4 +1,12 @@
-import { IsString, IsNotEmpty, IsUrl, IsEnum, IsOptional, IsObject } from 'class-validator';
+import {
+  IsString,
+  IsNotEmpty,
+  IsUrl,
+  IsEnum,
+  IsOptional,
+  IsObject,
+  Matches,
+} from 'class-validator';
 import { SitePlatform } from '../entities/site.entity.js';
 
 export class UpdateSiteDto {
@@ -14,6 +22,14 @@ export class UpdateSiteDto {
   @IsOptional()
   @IsEnum(SitePlatform)
   platform?: SitePlatform;
+
+  @IsOptional()
+  @IsString()
+  @Matches(/^[a-zA-Z0-9]([a-zA-Z0-9\-.]*[a-zA-Z0-9])?$/, {
+    message:
+      'domain must be a valid hostname without protocol or trailing slash (e.g. "myblog.com")',
+  })
+  domain?: string;
 
   @IsOptional()
   @IsObject()

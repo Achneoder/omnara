@@ -21,6 +21,9 @@ export class Site {
   @Enum(() => SitePlatform)
   platform!: SitePlatform;
 
+  @Property({ type: 'varchar', length: 253, nullable: true, unique: true })
+  domain: string | null = null;
+
   @Property({ type: 'jsonb', nullable: true, default: '{}' })
   settings: Record<string, unknown> | null = {};
 
